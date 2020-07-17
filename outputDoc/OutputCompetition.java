@@ -81,7 +81,7 @@ public class OutputCompetition {
 
       for(int path = 0; path < specialities.length; ++path) {
          boolean wasWritten = false;
-         String query = moduleType.equals("аспирантура")?"select * from AbiturientCompetitiveGroup where course = \'" + specialities[path][0] + "\'" + (forInternalNeeds?"":"and AbiturientCompetitiveGroup.markEnrollment > -1 "):"select * from AbiturientCompetitiveGroup where speciality = \'" + specialities[path][0] + "\'" + (forInternalNeeds?"":"and AbiturientCompetitiveGroup.markEnrollment > -1 ");
+         String query = moduleType.equals("аспирантура")?"select * from AbiturientCompetitiveGroup where course = \'" + specialities[path][0] + "\'" + (forInternalNeeds?"":"and AbiturientCompetitiveGroup.markEnrollment > -1 "):"select * from AbiturientCompetitiveGroup inner join AdmissionPlan on AbiturientCompetitiveGroup.competitiveGroup = AdmissionPlan.competitiveGroup and speciality = specialtyCode where speciality = \'" + specialities[path][0] + "\'" + (forInternalNeeds?"":"and AbiturientCompetitiveGroup.markEnrollment > -1 ");
          cstmt = con.prepareCall(query, 1004, 1007);
          rset = cstmt.executeQuery();
          int file = rset.last()?rset.getRow():0;
@@ -116,7 +116,7 @@ public class OutputCompetition {
                // отвечает за КЦП + целевеков
                if(!competitiveGroups[cg_i][0].equals("2") || !competitiveGroups[cg_i][0].equals("3") || !competitiveGroups[cg_i][0].equals("4") || !competitiveGroups[cg_i][0].equals("5")) {
                   query = moduleType.equals("аспирантура")?"select * from AbiturientCompetitiveGroup where course = \'" + specialities[path][0] + "\' and competitiveGroup in (1,2) " + (forInternalNeeds?"":"and AbiturientCompetitiveGroup.markEnrollment > -1 "):"select * from AbiturientCompetitiveGroup where speciality = \'" + specialities[path][0] + "\' and competitiveGroup in (\'" + cg_i + "\' , 2) " + (forInternalNeeds?"":"and AbiturientCompetitiveGroup.markEnrollment > -1 ");
-                  for (int to_i = 0; to_i < targetOrganisations.length; ++to_i) {
+                  //for (int to_i = 0; to_i < targetOrganisations.length; ++to_i) {
                     // if ()
                      cstmt = con.prepareCall(query, 1004, 1007);
                      rset = cstmt.executeQuery();
