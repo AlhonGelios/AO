@@ -262,15 +262,15 @@ public class OutputCompetition {
                                           abitAllCompetitiveGroups = 0;
 
                                           for(allCompetitiveGroupsForCurAbit = 0; allCompetitiveGroupsForCurAbit < (var49 == null?0:var49.length); ++allCompetitiveGroupsForCurAbit) {
-                                             if(Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][1]).intValue() <= 5) {
+                                             if(Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][1]).intValue() <= 11) {
                                                 allAchivmentsForCurAbit += Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][2]).intValue();
                                              } else {
                                                 abitAllCompetitiveGroups += Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][2]).intValue();
                                              }
                                           }
 
-                                          indAchSum = allAchivmentsForCurAbit + (abitAllCompetitiveGroups > 15?15:abitAllCompetitiveGroups);
-                                          indAchSum = indAchSum > 100?100:indAchSum;
+                                          indAchSum = allAchivmentsForCurAbit + (abitAllCompetitiveGroups > 5?5:abitAllCompetitiveGroups);
+                                          //indAchSum = indAchSum > 100?100:indAchSum;
                                        }
 
                                        row.createCell(curCellNum).setCellValue((double)indAchSum);
@@ -338,15 +338,15 @@ public class OutputCompetition {
                                           abitAllCompetitiveGroups = 0;
 
                                           for(allCompetitiveGroupsForCurAbit = 0; allCompetitiveGroupsForCurAbit < (var49 == null?0:var49.length); ++allCompetitiveGroupsForCurAbit) {
-                                             if(Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][1]).intValue() <= 5) {
+                                             if(Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][1]).intValue() <= 11) {
                                                 allAchivmentsForCurAbit += Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][2]).intValue();
                                              } else {
                                                 abitAllCompetitiveGroups += Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][2]).intValue();
                                              }
                                           }
 
-                                          indAchSum = allAchivmentsForCurAbit + (abitAllCompetitiveGroups > 15?15:abitAllCompetitiveGroups);
-                                          indAchSum = indAchSum > 100?100:indAchSum;
+                                          indAchSum = allAchivmentsForCurAbit + (abitAllCompetitiveGroups > 5?5:abitAllCompetitiveGroups);
+                                          //indAchSum = indAchSum > 100?100:indAchSum;
                                        }
 
                                        row.createCell(curCellNum).setCellValue((double)indAchSum);
@@ -661,14 +661,14 @@ public class OutputCompetition {
                         row.getCell(1).setCellStyle(styleForTargetOrgs);
                         if(!moduleType.equals("аспирантура")) {
                            var42 = 1;
-                           query = "select aid, SName, Fname, isNULL(MName,\'\'), competitiveBall, case when originalsReceivedDate is not null then \'+\' else \'-\' end, case when returnDate is not null then \'+\' else \'-\' end, (select sum(isNULL(score, 0)) from AbiturientEntranceTests where AbiturientCompetitiveGroup.aid_abiturient = AbiturientEntranceTests.aid_abiturient) as entranceTestsSum, (select isNull(avgBall, 0) from AbiturientHigherEducation where AbiturientCompetitiveGroup.aid_abiturient = AbiturientHigherEducation.aid_abiturient) as avgDiplomaBall, Chair.name, TargetOrganisation.name from (Chair join AbiturientCompetitiveGroup on (AbiturientCompetitiveGroup.chair = Chair.id) join TargetOrganisation on (AbiturientCompetitiveGroup.targetOrganisation = TargetOrganisation.id) join Abiturient on (AbiturientCompetitiveGroup.aid_abiturient = Abiturient.aid)) left outer join ReturnReasons on (ReturnReasons.id = Abiturient.id_returnReason) where speciality = \'" + specialities[path][0] + "\' and targetOrganisation is null " + (forInternalNeeds?"":"and AbiturientCompetitiveGroup.markEnrollment > -1 ") + "order by competitiveBall desc, entranceTestsSum desc, avgDiplomaBall desc";
+                           query = "select aid, SName, Fname, isNULL(MName,\'\'), competitiveBall, case when originalsReceivedDate is not null then \'+\' else \'-\' end, case when returnDate is not null then \'+\' else \'-\' end, (select sum(isNULL(score, 0)) from AbiturientEntranceTests where AbiturientCompetitiveGroup.aid_abiturient = AbiturientEntranceTests.aid_abiturient) as entranceTestsSum, (select isNull(avgBall, 0) from AbiturientHigherEducation where AbiturientCompetitiveGroup.aid_abiturient = AbiturientHigherEducation.aid_abiturient) as avgDiplomaBall, Chair.name from (Chair join AbiturientCompetitiveGroup on (AbiturientCompetitiveGroup.chair = Chair.id) join Abiturient on (AbiturientCompetitiveGroup.aid_abiturient = Abiturient.aid)) left outer join ReturnReasons on (ReturnReasons.id = Abiturient.id_returnReason) where speciality = \'" + specialities[path][0] + "\' and targetOrganisation is null and competitiveGroup = 2" + (forInternalNeeds?"":"and AbiturientCompetitiveGroup.markEnrollment > -1 ") + "order by competitiveBall desc, entranceTestsSum desc, avgDiplomaBall desc";
                            System.out.println(query);
                            cstmt = con.prepareCall(query, 1004, 1007);
                            rset = cstmt.executeQuery();
                            countAbitsOnCurSpecOnCurCompGrAndSt = rset.last()?rset.getRow():0;
                            rset.beforeFirst();
                            if(countAbitsOnCurSpecOnCurCompGrAndSt > 0) {
-                              row = sheet.createRow(rowNum++);
+                              //row = sheet.createRow(rowNum++);
                               row = sheet.createRow(rowNum++);
                               var45 = false;
                               if(moduleType.equals("аспирантура")) {
@@ -741,9 +741,9 @@ public class OutputCompetition {
                                  row.createCell(curCellNum).setCellValue("Приоритеты");
                                  row.getCell(curCellNum).setCellStyle(styleForNames);
                                  ++curCellNum;
-                                 row.createCell(curCellNum).setCellValue("Целевая организация");
-                                 row.getCell(curCellNum).setCellStyle(styleForNames);
-                                 ++curCellNum;
+                                 // row.createCell(curCellNum).setCellValue("Целевая организация");
+                                 // row.getCell(curCellNum).setCellStyle(styleForNames);
+                                 // ++curCellNum;
                               }
 
                               while(rset.next()) {
@@ -782,15 +782,15 @@ public class OutputCompetition {
                                        abitAllCompetitiveGroups = 0;
 
                                        for(allCompetitiveGroupsForCurAbit = 0; allCompetitiveGroupsForCurAbit < (var49 == null?0:var49.length); ++allCompetitiveGroupsForCurAbit) {
-                                          if(Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][1]).intValue() <= 5) {
+                                          if(Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][1]).intValue() <= 11) {
                                              allAchivmentsForCurAbit += Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][2]).intValue();
                                           } else {
                                              abitAllCompetitiveGroups += Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][2]).intValue();
                                           }
                                        }
 
-                                       indAchSum = allAchivmentsForCurAbit + (abitAllCompetitiveGroups > 15?15:abitAllCompetitiveGroups);
-                                       indAchSum = indAchSum > 100?100:indAchSum;
+                                       indAchSum = allAchivmentsForCurAbit + (abitAllCompetitiveGroups > 5?5:abitAllCompetitiveGroups);
+                                       //indAchSum = indAchSum > 100?100:indAchSum;
                                     }
 
                                     row.createCell(curCellNum).setCellValue((double)indAchSum);
@@ -858,15 +858,15 @@ public class OutputCompetition {
                                        abitAllCompetitiveGroups = 0;
 
                                        for(allCompetitiveGroupsForCurAbit = 0; allCompetitiveGroupsForCurAbit < (var49 == null?0:var49.length); ++allCompetitiveGroupsForCurAbit) {
-                                          if(Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][1]).intValue() <= 5) {
+                                          if(Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][1]).intValue() <= 11) {
                                              allAchivmentsForCurAbit += Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][2]).intValue();
                                           } else {
                                              abitAllCompetitiveGroups += Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][2]).intValue();
                                           }
                                        }
 
-                                       indAchSum = allAchivmentsForCurAbit + (abitAllCompetitiveGroups > 15?15:abitAllCompetitiveGroups);
-                                       indAchSum = indAchSum > 100?100:indAchSum;
+                                       indAchSum = allAchivmentsForCurAbit + (abitAllCompetitiveGroups > 5?5:abitAllCompetitiveGroups);
+                                       //indAchSum = indAchSum > 100?100:indAchSum;
                                     }
 
                                     row.createCell(curCellNum).setCellValue((double)indAchSum);
@@ -904,8 +904,8 @@ public class OutputCompetition {
                                     row.createCell(curCellNum).setCellValue(var54);
                                     row.getCell(curCellNum).setCellStyle(styleForCells);
                                     ++curCellNum;
-                                    row.createCell(curCellNum).setCellValue(rset.getString(11));
-                                    row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
+                                    // row.createCell(curCellNum).setCellValue(rset.getString(11));
+                                    // row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
                                  }
                               }
                            }
@@ -1326,15 +1326,15 @@ public class OutputCompetition {
                                  abitAllCompetitiveGroups = 0;
 
                                  for(allCompetitiveGroupsForCurAbit = 0; allCompetitiveGroupsForCurAbit < (var49 == null?0:var49.length); ++allCompetitiveGroupsForCurAbit) {
-                                    if(Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][1]).intValue() <= 5) {
+                                    if(Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][1]).intValue() <= 11) {
                                        allAchivmentsForCurAbit += Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][2]).intValue();
                                     } else {
                                        abitAllCompetitiveGroups += Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][2]).intValue();
                                     }
                                  }
 
-                                 indAchSum = allAchivmentsForCurAbit + (abitAllCompetitiveGroups > 15?15:abitAllCompetitiveGroups);
-                                 indAchSum = indAchSum > 100?100:indAchSum;
+                                 indAchSum = allAchivmentsForCurAbit + (abitAllCompetitiveGroups > 5?5:abitAllCompetitiveGroups);
+                                 //indAchSum = indAchSum > 100?100:indAchSum;
                               }
 
                               row.createCell(curCellNum).setCellValue((double)indAchSum);
@@ -1402,15 +1402,15 @@ public class OutputCompetition {
                                  abitAllCompetitiveGroups = 0;
 
                                  for(allCompetitiveGroupsForCurAbit = 0; allCompetitiveGroupsForCurAbit < (var49 == null?0:var49.length); ++allCompetitiveGroupsForCurAbit) {
-                                    if(Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][1]).intValue() <= 5) {
+                                    if(Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][1]).intValue() <= 11) {
                                        allAchivmentsForCurAbit += Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][2]).intValue();
                                     } else {
                                        abitAllCompetitiveGroups += Integer.valueOf(var49[allCompetitiveGroupsForCurAbit][2]).intValue();
                                     }
                                  }
 
-                                 indAchSum = allAchivmentsForCurAbit + (abitAllCompetitiveGroups > 15?15:abitAllCompetitiveGroups);
-                                 indAchSum = indAchSum > 100?100:indAchSum;
+                                 indAchSum = allAchivmentsForCurAbit + (abitAllCompetitiveGroups > 5?5:abitAllCompetitiveGroups);
+                                 //indAchSum = indAchSum > 100?100:indAchSum;
                               }
 
                               row.createCell(curCellNum).setCellValue((double)indAchSum);
