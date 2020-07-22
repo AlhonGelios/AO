@@ -25,7 +25,7 @@ public class OutputExportFiles {
 
    public static void printIndividualAchievements() throws Exception {
       String moduleTypeCode = ModelDBConnection.getDBName().equals("Aspirant")?"1_":"2_";
-      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"Р°СЃРїРёСЂР°РЅС‚СѓСЂР°":"РѕСЂРґРёРЅР°С‚СѓСЂР°";
+      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"аспирантура":"ординатура";
       Connection con = ModelDBConnection.getConnection();
       Object rset1 = null;
       CallableStatement cstmt1 = null;
@@ -55,7 +55,7 @@ public class OutputExportFiles {
             out.println("<Name>" + rset.getString(2) + "_" + getCurrentYear() + "</Name>");
             out.println("<IdCategory>13</IdCategory>");
             out.println("<MaxValue>" + rset.getInt(3) + "</MaxValue>");
-            out.println("<CampaignUID>" + getCurrentYear() + "_РљР’Рљ" + "</CampaignUID>");
+            out.println("<CampaignUID>" + getCurrentYear() + "_КВК" + "</CampaignUID>");
             out.println("</InstitutionAchievement>");
             String query1 = "update IndividualAchievement set codeFIS = \'ia18_" + moduleTypeCode + rset.getInt(1) + "_" + getCurrentYear() + "\' where id = " + rset.getInt(1) + ";";
             cstmt1 = con.prepareCall(query1, 1004, 1007);
@@ -72,7 +72,7 @@ public class OutputExportFiles {
    }
 
    public static void printTargetOrganisations() throws Exception {
-      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"Р°СЃРїРёСЂР°РЅС‚СѓСЂР°":"РѕСЂРґРёРЅР°С‚СѓСЂР°";
+      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"аспирантура":"ординатура";
       Connection con = ModelDBConnection.getConnection();
       Object rset1 = null;
       CallableStatement cstmt1 = null;
@@ -87,7 +87,7 @@ public class OutputExportFiles {
       out.println("<Login>ulitinh@nizhgma.ru</Login>");
       out.println("<Pass>Grandopera200352</Pass>");
       out.println("</AuthData>");
-      if(moduleType.equals("РѕСЂРґРёРЅР°С‚СѓСЂР°")) {
+      if(moduleType.equals("ординатура")) {
          String query = "select id, name from TargetOrganisation order by id";
          CallableStatement cstmt = con.prepareCall(query, 1004, 1007);
          ResultSet rset = cstmt.executeQuery();
@@ -120,7 +120,7 @@ public class OutputExportFiles {
 
    public static void printAssesmentPlanGeneral() throws Exception {
       String moduleTypeCode = ModelDBConnection.getDBName().equals("Aspirant")?"1_":"2_";
-      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"Р°СЃРїРёСЂР°РЅС‚СѓСЂР°":"РѕСЂРґРёРЅР°С‚СѓСЂР°";
+      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"аспирантура":"ординатура";
       Connection con = ModelDBConnection.getConnection();
       ResultSet rset = null;
       CallableStatement cstmt = null;
@@ -137,7 +137,7 @@ public class OutputExportFiles {
       out.println("</AuthData>");
       String query;
       int countOfTargOrgs;
-      if(moduleType.equals("РѕСЂРґРёРЅР°С‚СѓСЂР°")) {
+      if(moduleType.equals("ординатура")) {
          query = "select\t" + (ModelDBConnection.getDBName().equals("Aspirant")?"codeFIS":"codeDirection") + ", " + "((select ISNULL(sum(AdmissionPlan.placeCount), 0) from AdmissionPlan where " + (ModelDBConnection.getDBName().equals("Aspirant")?"course = Course":"specialtyCode = Speciality") + ".id and competitiveGroup = 2) - (select ISNULL(sum(AdmissionPlan.placeCount), 0) from AdmissionPlan where " + (ModelDBConnection.getDBName().equals("Aspirant")?"course = Course":"specialtyCode = Speciality") + ".id and competitiveGroup in (1))), " + "(select ISNULL(sum(AdmissionPlan.placeCount), 0) from AdmissionPlan where " + (ModelDBConnection.getDBName().equals("Aspirant")?"course = Course":"specialtyCode = Speciality") + ".id and competitiveGroup in (3, 4)), " + "(select ISNULL(sum(AdmissionPlan.placeCount), 0) from AdmissionPlan where " + (ModelDBConnection.getDBName().equals("Aspirant")?"course = Course":"specialtyCode = Speciality") + ".id and competitiveGroup = 1) " + "from " + (ModelDBConnection.getDBName().equals("Aspirant")?"Course order by Course":"Speciality order by Speciality") + ".id";
          cstmt = con.prepareCall(query, 1004, 1007);
          rset = cstmt.executeQuery();
@@ -151,7 +151,7 @@ public class OutputExportFiles {
             while(rset.next()) {
                out.println("<Item>");
                out.println("<UID>18_" + moduleTypeCode + rset.getString(1) + "_" + getCurrentYear() + "</UID>");
-               out.println("<CampaignUID>" + getCurrentYear() + "_РљР’Рљ" + "</CampaignUID>");
+               out.println("<CampaignUID>" + getCurrentYear() + "_КВК" + "</CampaignUID>");
                out.println("<EducationLevelID>18</EducationLevelID>");
                out.println("<DirectionID>" + rset.getString(1) + "</DirectionID>");
                out.println("<NumberBudgetO>" + rset.getString(2) + "</NumberBudgetO>");
@@ -181,7 +181,7 @@ public class OutputExportFiles {
       out.println("<Login>login</Login>");
       out.println("<Pass>password</Pass>");
       out.println("</AuthData>");
-      if(moduleType.equals("РѕСЂРґРёРЅР°С‚СѓСЂР°")) {
+      if(moduleType.equals("ординатура")) {
          query = "select\t" + (ModelDBConnection.getDBName().equals("Aspirant")?"codeFIS":"codeDirection") + ", " + "((select ISNULL(sum(AdmissionPlan.placeCount), 0) from AdmissionPlan where " + (ModelDBConnection.getDBName().equals("Aspirant")?"course = Course":"specialtyCode = Speciality") + ".id and competitiveGroup = 2) - (select ISNULL(sum(AdmissionPlan.placeCount), 0) from AdmissionPlan where " + (ModelDBConnection.getDBName().equals("Aspirant")?"course = Course":"specialtyCode = Speciality") + ".id and competitiveGroup in (1))), " + "(select ISNULL(sum(AdmissionPlan.placeCount), 0) from AdmissionPlan where " + (ModelDBConnection.getDBName().equals("Aspirant")?"course = Course":"specialtyCode = Speciality") + ".id and competitiveGroup in (3, 4)), " + "(select ISNULL(sum(AdmissionPlan.placeCount), 0) from AdmissionPlan where " + (ModelDBConnection.getDBName().equals("Aspirant")?"course = Course":"specialtyCode = Speciality") + ".id and competitiveGroup = 1) " + "from " + (ModelDBConnection.getDBName().equals("Aspirant")?"Course order by Course":"Speciality order by Speciality") + ".id";
          cstmt = con.prepareCall(query, 1004, 1007);
          rset = cstmt.executeQuery();
@@ -214,7 +214,7 @@ public class OutputExportFiles {
    }
 
    public static void printCompetitiveGroups() throws Exception {
-      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"Р°СЃРїРёСЂР°РЅС‚СѓСЂР°":"РѕСЂРґРёРЅР°С‚СѓСЂР°";
+      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"аспирантура":"ординатура";
       Connection con = ModelDBConnection.getConnection();
       ResultSet rset = null;
       CallableStatement cstmt = null;
@@ -230,7 +230,7 @@ public class OutputExportFiles {
       out.println("<Login>login</Login>");
       out.println("<Pass>password</Pass>");
       out.println("</AuthData>");
-      if(moduleType.equals("РѕСЂРґРёРЅР°С‚СѓСЂР°")) {
+      if(moduleType.equals("ординатура")) {
          String query = "select\tCompetitiveGroup.codeFIS, EducationForm.codeFIS, case when targetOrganisation is null then null else (select codeFIS from TargetOrganisation where id = targetOrganisation) end, case when targetOrganisation is null then \'\' else (select name from TargetOrganisation where id = targetOrganisation) end, Speciality.codeDirection, Speciality.name, Speciality.codeByStandart, placeCount, CompetitiveGroup.id, case when targetOrganisation is null then \'\' else targetOrganisation end, isNULL((select placeCount from AdmissionPlan where specialtyCode = Speciality.id and educationForm = EducationForm.id and competitiveGroup = 1), 0)from\tAdmissionPlan join Speciality on (specialtyCode = Speciality.id) join EducationForm on (educationForm = EducationForm.id) join CompetitiveGroup on (competitiveGroup = CompetitiveGroup.id)";
          cstmt = con.prepareCall(query, 1004, 1007);
          rset = cstmt.executeQuery();
@@ -244,7 +244,7 @@ public class OutputExportFiles {
             while(rset.next()) {
                out.println("<CompetitiveGroup>");
                out.println("<UID>18_2_" + rset.getString(1) + "_" + rset.getString(2) + "_" + rset.getString(5) + "_" + rset.getString(9) + "_" + rset.getString(10) + "_" + getCurrentYear() + "</UID>");
-               out.println("<CampaignUID>" + getCurrentYear() + "_РљР’Рљ" + "</CampaignUID>");
+               out.println("<CampaignUID>" + getCurrentYear() + "_КВК" + "</CampaignUID>");
                out.println("<Name>" + rset.getString(6) + (!rset.getString(4).equals("")?": " + rset.getString(4):"_" + rset.getString(9)) + "_" + getCurrentYear() + "</Name>");
                out.println("<EducationLevelID>18</EducationLevelID>");
                out.println("<EducationSourceID>" + rset.getString(1) + "</EducationSourceID>");
@@ -333,7 +333,7 @@ public class OutputExportFiles {
    }
 
    public static void printEducationPrograms() throws Exception {
-      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"Р°СЃРїРёСЂР°РЅС‚СѓСЂР°":"РѕСЂРґРёРЅР°С‚СѓСЂР°";
+      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"аспирантура":"ординатура";
       Connection con = ModelDBConnection.getConnection();
       ResultSet rset = null;
       CallableStatement cstmt = null;
@@ -349,7 +349,7 @@ public class OutputExportFiles {
       out.println("<Login>login</Login>");
       out.println("<Pass>password</Pass>");
       out.println("</AuthData>");
-      if(moduleType.equals("РѕСЂРґРёРЅР°С‚СѓСЂР°")) {
+      if(moduleType.equals("ординатура")) {
          String query = "select\tdistinct cast(CompetitiveGroup.codeFIS as varchar(max)), cast(EducationForm.codeFIS as varchar(max)), case when targetOrganisation is null then null else (select cast(codeFIS as varchar(max)) from TargetOrganisation where id = targetOrganisation) end, case when targetOrganisation is null then \'\' else (select cast(name as varchar(max)) from TargetOrganisation where id = targetOrganisation) end, cast(Speciality.codeDirection as varchar(max)), cast(Speciality.name as varchar(max)), cast(Speciality.codeByStandart as varchar(max)), placeCount, CompetitiveGroup.id, case when targetOrganisation is null then \'\' else targetOrganisation end from\tAdmissionPlan join Speciality on (specialtyCode = Speciality.id) join EducationForm on (educationForm = EducationForm.id) join CompetitiveGroup on (competitiveGroup = CompetitiveGroup.id)";
          cstmt = con.prepareCall(query, 1004, 1007);
          rset = cstmt.executeQuery();
@@ -379,9 +379,9 @@ public class OutputExportFiles {
    }
 
    public static void printAbiturientsAssesments() throws Exception {
-      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"Р°СЃРїРёСЂР°РЅС‚СѓСЂР°":"РѕСЂРґРёРЅР°С‚СѓСЂР°";
+      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"аспирантура":"ординатура";
       Connection con = ModelDBConnection.getConnection();
-      File file = new File(currentPath + "\\Abiturients_" + moduleType + "_" + (new SimpleDateFormat("dd.MM.yyyy")).format(new Date()) + ".txt");
+      File file = new File(currentPath + "\\Abiturients_" + moduleType + "_" + (new SimpleDateFormat("dd.MM.yyyy")).format(new Date()) + ".xml");
       if(!file.exists()) {
          file.createNewFile();
       }
@@ -392,8 +392,8 @@ public class OutputExportFiles {
       out.println("<Login>login</Login>");
       out.println("<Pass>password</Pass>");
       out.println("</AuthData>");
-      if(moduleType.equals("РѕСЂРґРёРЅР°С‚СѓСЂР°")) {
-         String query_generalInfo = "select\taid, SName, FName, isNULL(MName, \'\'), (select codeFIS from Gender where id = id_gender), isNULL(email, \'\'), (select codeFIS from Region where id = id_region), (select codeFIS from LocalityType where id = id_localityType), factAddress, registrationDate, isNULL(needHostel, 0), case when returnDate is null then 1 else 0 end, isNULL(AbiturientPassport.paspSeries, \'\'), AbiturientPassport.paspNumber, AbiturientPassport.paspGivenDate, (select codeFIS from PassportType where id = AbiturientPassport.id_passportType), (select codeFIS from Nationality where id = id_nationality), Birthday, Birthplace, isNULL(AbiturientHigherEducation.diplomaSeries, \'\'), isNULL(AbiturientHigherEducation.diplomaNumber, \'\'), isNULL(AbiturientHigherEducation.instituteName, \'\') from\tAbiturient join AbiturientAddress on (Abiturient.aid = AbiturientAddress.aid_abiturient) join AbiturientPassport on (Abiturient.aid = AbiturientPassport.aid_abiturient) join AbiturientHigherEducation on (Abiturient.aid = AbiturientHigherEducation.aid_abiturient) order by aid";
+      if(moduleType.equals("ординатура")) {
+         String query_generalInfo = "select\taid, SName, FName, isNULL(MName, \'\'), (select codeFIS from Gender where id = id_gender), isNULL(email, \'\'), (select codeFIS from Region where id = id_region), (select codeFIS from LocalityType where id = id_localityType), factAddress, registrationDate, isNULL(needHostel, 0), case when returnDate is null then 1 else 0 end, isNULL(AbiturientPassport.paspSeries, \'\'), AbiturientPassport.paspNumber, AbiturientPassport.paspGivenDate, (select codeFIS from PassportType where id = AbiturientPassport.id_passportType), (select codeFIS from Nationality where id = id_nationality), Birthday, Birthplace, isNULL(AbiturientHigherEducation.diplomaSeries, \'\'), isNULL(AbiturientHigherEducation.diplomaNumber, \'\'), isNULL(AbiturientHigherEducation.instituteName, \'\'), returnDate, id_returnReason from\tAbiturient join AbiturientAddress on (Abiturient.aid = AbiturientAddress.aid_abiturient) join AbiturientPassport on (Abiturient.aid = AbiturientPassport.aid_abiturient) join AbiturientHigherEducation on (Abiturient.aid = AbiturientHigherEducation.aid_abiturient) order by aid";
          CallableStatement cstmt = con.prepareCall(query_generalInfo, 1004, 1007);
          ResultSet rset = cstmt.executeQuery();
          int countOfAbiturientss = rset.last()?rset.getRow():0;
@@ -430,6 +430,10 @@ public class OutputExportFiles {
                out.println("<RegistrationDate>" + rset.getString(10) + "T09:00:00</RegistrationDate>");
                out.println("<NeedHostel>" + rset.getInt(11) + "</NeedHostel>");
                out.println("<StatusID>" + (rset.getInt(12) > 0?4:6) + "</StatusID>");
+               if (rset.getInt(12) == 0) {
+                  out.println("<ReturnDocumentsDate>" + rset.getString(23) + "T09:00:00</ReturnDocumentsDate>");
+                  out.println("<ReturnDocumentsTypeId>" + rset.getInt(24) + "</ReturnDocumentsTypeId>");
+               };
                String query_competitiveGroups = "select  CompetitiveGroup.codeFIS, EducationForm.codeFIS, Speciality.codeDirection, CompetitiveGroup.id, case when targetOrganisation is null then \'\' else targetOrganisation end, case when targetOrganisation is null then \'\' else (select codeFIS from TargetOrganisation where id = targetOrganisation) end, case when originalsReceivedDate is null then \'\' else cast(originalsReceivedDate as varchar) end from\tAbiturientCompetitiveGroup join Speciality on (speciality = Speciality.id) join EducationForm on (educationForm = EducationForm.id) join CompetitiveGroup on (competitiveGroup = CompetitiveGroup.id) where aid_abiturient = " + rset.getInt(1);
                CallableStatement cstmt1 = con.prepareCall(query_competitiveGroups, 1004, 1007);
                ResultSet rset1 = cstmt1.executeQuery();
@@ -440,7 +444,7 @@ public class OutputExportFiles {
                out.println("<FinSourceAndEduForms>");
 
                while(rset1.next()) {
-                  competitiveGroupsByCurAbiturient[curCompetitiveGroupsByCurAbiturient] = "18_2_" + rset1.getString(1) + "_" + rset1.getString(2) + "_" + rset1.getString(3) + "_" + rset1.getString(4) + "_" + "0" + "_" + getCurrentYear();
+                  competitiveGroupsByCurAbiturient[curCompetitiveGroupsByCurAbiturient] = "18_2_" + rset1.getString(1) + "_" + rset1.getString(2) + "_" + rset1.getString(3) + "_" + rset1.getString(4) + "_" + rset1.getString(5) + "_" + getCurrentYear();
                   out.println("<FinSourceEduForm>");
                   out.println("<CompetitiveGroupUID>" + competitiveGroupsByCurAbiturient[curCompetitiveGroupsByCurAbiturient] + "</CompetitiveGroupUID>");
                   if(!rset1.getString(6).equals("")) {
@@ -565,16 +569,16 @@ public class OutputExportFiles {
    }
 
    public static void printAbiturientsForOrdIS() throws Exception {
-      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"Р°СЃРїРёСЂР°РЅС‚СѓСЂР°":"РѕСЂРґРёРЅР°С‚СѓСЂР°";
+      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"аспирантура":"ординатура";
       Connection con = ModelDBConnection.getConnection();
-      File file = new File(currentPath + "\\Abiturients_IS_" + moduleType + "_" + (new SimpleDateFormat("dd.MM.yyyy")).format(new Date()) + ".txt");
+      File file = new File(currentPath + "\\Abiturients_IS_" + moduleType + "_" + (new SimpleDateFormat("dd.MM.yyyy")).format(new Date()) + ".csv");
       if(!file.exists()) {
          file.createNewFile();
       }
 
       PrintWriter out = new PrintWriter(file.getAbsoluteFile(), "UTF8");
-      if(moduleType.equals("РѕСЂРґРёРЅР°С‚СѓСЂР°")) {
-         String query_generalInfo = "select\tAbiturient.aid,  isNULL(Abiturient.snils, \'\'),  isNULL(Abiturient.SName, \'\'),  isNULL(Abiturient.FName, \'\'),  isNULL(Abiturient.MName, \'\'), \'1.2.643.5.1.13.13.12.4.52.55\', \'2\', CONVERT(varchar, Abiturient.Birthday, 104), Nationality.name, Speciality.codeByStandart, case when AbiturientCompetitiveGroup.competitiveGroup in (1,2) then \'Р±СЋРґР¶РµС‚\' else \'РґРѕРіРѕРІРѕСЂ\' end, CONVERT(varchar, Abiturient.registrationDate, 104), case when AbiturientCompetitiveGroup.competitiveGroup in (1) then \'РґР°\' else \'РЅРµС‚\' end from\tAbiturient,  AbiturientCompetitiveGroup, Speciality, Nationality  where\t(Abiturient.aid = AbiturientCompetitiveGroup.aid_abiturient and Speciality.id = AbiturientCompetitiveGroup.speciality and Abiturient.id_nationality = Nationality.id and Abiturient.returnDate is null)  order by Abiturient.aid";
+      if(moduleType.equals("ординатура")) {
+         String query_generalInfo = "select\tAbiturient.aid,  isNULL(Abiturient.snils, \'\'),  isNULL(Abiturient.SName, \'\'),  isNULL(Abiturient.FName, \'\'),  isNULL(Abiturient.MName, \'\'), \'1.2.643.5.1.13.13.12.4.52.55\', \'3\', CONVERT(varchar, Abiturient.Birthday, 104), Nationality.name, Speciality.codeByStandart, case when AbiturientCompetitiveGroup.competitiveGroup in (1,2,6,7,8,9,10,11,12,13,14,15,16,17) then \'бюджет\' else \'договор\' end, CONVERT(varchar, Abiturient.registrationDate, 104), case when AbiturientCompetitiveGroup.competitiveGroup in (1,6,7,8,9,10,11,12,13,14,15,16,17) then \'да\' else \'нет\' end from\tAbiturient,  AbiturientCompetitiveGroup, Speciality, Nationality  where\t(Abiturient.aid = AbiturientCompetitiveGroup.aid_abiturient and Speciality.id = AbiturientCompetitiveGroup.speciality and Abiturient.id_nationality = Nationality.id and Abiturient.returnDate is null) and snils != 11111111111 order by Abiturient.aid";
          CallableStatement cstmt = con.prepareCall(query_generalInfo, 1004, 1007);
          ResultSet rset = cstmt.executeQuery();
          int countOfAbiturientss = rset.last()?rset.getRow():0;
@@ -598,180 +602,187 @@ public class OutputExportFiles {
                      String var12;
                      switch((var12 = rset.getString(9)).hashCode()) {
                      case -1764972107:
-                        if(var12.equals("РџСЂРёРґРЅРµСЃС‚СЂРѕРІСЃРєР°СЏ РњРѕР»РґР°РІСЃРєР°СЏ Р РµСЃРїСѓР±Р»РёРєР°")) {
+                        if(var12.equals("Приднестровская Молдавская Республика")) {
                            break label161;
                         }
                         break;
                      case -1761702881:
-                        if(var12.equals("Р‘РѕР»РёРІРёСЏ")) {
+                        if(var12.equals("Боливия")) {
                            citizenCode = "68";
                            break label162;
                         }
                         break;
                      case -1164139097:
-                        if(var12.equals("РљРёСЂРіРёР·РёСЏ")) {
+                        if(var12.equals("Киргизия")) {
                            citizenCode = "417";
                            break label162;
                         }
                         break;
                      case -1108219200:
-                        if(var12.equals("РўСѓСЂРєРјРµРЅРёСЏ")) {
+                        if(var12.equals("Туркмения")) {
                            citizenCode = "795";
                            break label162;
                         }
                         break;
                      case -985101012:
-                        if(var12.equals("РњР°СЂРѕРєРєРѕ")) {
+                        if(var12.equals("Марокко")) {
                            citizenCode = "504";
                            break label162;
                         }
                         break;
                      case -548678217:
-                        if(var12.equals("РђР·РµСЂР±Р°Р№РґР¶Р°РЅ")) {
+                        if(var12.equals("Азербайджан")) {
                            citizenCode = "31";
                            break label162;
                         }
                         break;
                      case -546214460:
-                        if(var12.equals("РЈР·Р±РµРєРёСЃС‚Р°РЅ")) {
+                        if(var12.equals("Узбекистан")) {
                            citizenCode = "860";
                            break label162;
                         }
                         break;
                      case -53140485:
-                        if(var12.equals("РўР°РЅР·Р°РЅРёСЏ, РћР±СЉРµРґРёРЅРµРЅРЅР°СЏ Р РµСЃРїСѓР±Р»РёРєР°")) {
+                        if(var12.equals("Танзания, Объединенная Республика")) {
                            citizenCode = "834";
                            break label162;
                         }
                         break;
                      case 119167706:
-                        if(var12.equals("РќРёРіРµСЂРёСЏ")) {
+                        if(var12.equals("Нигерия")) {
                            citizenCode = "566";
                            break label162;
                         }
                         break;
                      case 319709323:
-                        if(var12.equals("РљРѕС‚ Рґ РРІСѓР°СЂ")) {
+                        if(var12.equals("Кот д Ивуар")) {
                            citizenCode = "384";
                            break label162;
                         }
                         break;
                      case 466517392:
-                        if(var12.equals("Р“РѕРЅРґСѓСЂР°СЃ")) {
+                        if(var12.equals("Гондурас")) {
                            citizenCode = "340";
                            break label162;
                         }
                         break;
                      case 675953278:
-                        if(var12.equals("РРѕСЂРґР°РЅРёСЏ")) {
+                        if(var12.equals("Иордания")) {
                            citizenCode = "400";
                            break label162;
                         }
                         break;
                      case 878730162:
-                        if(var12.equals("Р•РіРёРїРµС‚")) {
+                        if(var12.equals("Египет")) {
                            citizenCode = "818";
                            break label162;
                         }
                         break;
                      case 933323717:
-                        if(var12.equals("Р—Р°РјР±РёСЏ")) {
+                        if(var12.equals("Замбия")) {
                            citizenCode = "894";
                            break label162;
                         }
                         break;
                      case 942503986:
-                        if(var12.equals("Р РѕСЃСЃРёР№СЃРєР°СЏ Р¤РµРґРµСЂР°С†РёСЏ")) {
+                        if(var12.equals("Российская Федерация")) {
                            citizenCode = "643";
                            break label162;
                         }
                         break;
                      case 993796019:
-                        if(var12.equals("РђР»Р¶РёСЂ")) {
+                        if(var12.equals("Алжир")) {
                            citizenCode = "12";
                            break label162;
                         }
                         break;
                      case 1002859225:
-                        if(var12.equals("РљРµРЅРёСЏ")) {
+                        if(var12.equals("Кения")) {
                            citizenCode = "404";
                            break label162;
                         }
                         break;
                      case 1003127172:
-                        if(var12.equals("РљРѕРЅРіРѕ")) {
+                        if(var12.equals("Конго")) {
                            citizenCode = "178";
                            break label162;
                         }
                         break;
                      case 1003861282:
-                        if(var12.equals("Р›РёРІР°РЅ")) {
+                        if(var12.equals("Ливан")) {
                            citizenCode = "422";
                            break label162;
                         }
                         break;
                      case 1009732031:
-                        if(var12.equals("РЎСѓРґР°РЅ")) {
+                        if(var12.equals("Судан")) {
                            citizenCode = "736";
                            break label162;
                         }
                         break;
                      case 1036464021:
-                        if(var12.equals("РљСѓРІРµР№С‚")) {
+                        if(var12.equals("Кувейт")) {
                            citizenCode = "414";
                            break label162;
                         }
                         break;
                      case 1048020028:
-                        if(var12.equals("Р›Р°С‚РІРёСЏ")) {
+                        if(var12.equals("Латвия")) {
                            citizenCode = "428";
                            break label162;
                         }
                         break;
                      case 1218330052:
-                        if(var12.equals("РЈРєСЂР°РёРЅР°")) {
+                        if(var12.equals("Украина")) {
                            citizenCode = "804";
                            break label162;
                         }
                         break;
                      case 1232543630:
-                        if(var12.equals("РЎРѕРјР°Р»Рё")) {
+                        if(var12.equals("Сомали")) {
                            citizenCode = "706";
                            break label162;
                         }
                         break;
                      case 1490499179:
-                        if(var12.equals("Р­РєРІР°РґРѕСЂ")) {
+                        if(var12.equals("Эквадор")) {
                            citizenCode = "218";
                            break label162;
                         }
                         break;
                      case 1703863755:
-                        if(var12.equals("РђСЂРјРµРЅРёСЏ")) {
+                        if(var12.equals("Армения")) {
                            citizenCode = "51";
                            break label162;
                         }
                         break;
                      case 1706105124:
-                        if(var12.equals("Р­СЃС‚РѕРЅРёСЏ")) {
+                        if(var12.equals("Эстония")) {
                            citizenCode = "233";
                            break label162;
                         }
                         break;
                      case 1817227143:
-                        if(var12.equals("Р‘РµР»Р°СЂСѓСЃСЊ")) {
+                        if(var12.equals("Беларусь")) {
                            citizenCode = "112";
                            break label162;
                         }
                         break;
                      case 2037640292:
-                        if(var12.equals("РљР°Р·Р°С…СЃС‚Р°РЅ")) {
+                        if(var12.equals("Казахстан")) {
                            citizenCode = "398";
                            break label162;
                         }
                         break;
+                     case 17576532:
+                        if(var12.equals("Йеменская Республика")) {
+                           citizenCode = "887";
+                           break label162;
+                        }
+                        break;
+                        
                      case 2068443093:
-                        if(var12.equals("Р РµСЃРїСѓР±Р»РёРєР° РњРѕР»РґРѕРІР°")) {
+                        if(var12.equals("Республика Молдова")) {
                            break label161;
                         }
                      }
@@ -813,7 +824,7 @@ public class OutputExportFiles {
    }
 
    public static void printforOrdISAbiturientsResultsRequest() throws Exception {
-      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"Р°СЃРїРёСЂР°РЅС‚СѓСЂР°":"РѕСЂРґРёРЅР°С‚СѓСЂР°";
+      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"аспирантура":"ординатура";
       Connection con = ModelDBConnection.getConnection();
       File file = new File(currentPath + "\\Abiturients_results_request_" + moduleType + "_" + (new SimpleDateFormat("dd.MM.yyyy")).format(new Date()) + ".txt");
       if(!file.exists()) {
@@ -821,7 +832,7 @@ public class OutputExportFiles {
       }
 
       PrintWriter out = new PrintWriter(file.getAbsoluteFile(), "UTF8");
-      if(moduleType.equals("РѕСЂРґРёРЅР°С‚СѓСЂР°")) {
+      if(moduleType.equals("ординатура")) {
          String query_generalInfo = "select\tAbiturient.aid,  isNULL(Abiturient.snils, \'\'),  \'1.2.643.5.1.13.13.12.4.52.55\', CONVERT(varchar, Abiturient.Birthday, 104) from\tAbiturient order by Abiturient.aid";
          CallableStatement cstmt = con.prepareCall(query_generalInfo, 1004, 1007);
          ResultSet rset = cstmt.executeQuery();
@@ -859,7 +870,7 @@ public class OutputExportFiles {
    }
 
    public static void printforOrdISAbiturientsLoginRequest() throws Exception {
-      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"Р°СЃРїРёСЂР°РЅС‚СѓСЂР°":"РѕСЂРґРёРЅР°С‚СѓСЂР°";
+      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"аспирантура":"ординатура";
       Connection con = ModelDBConnection.getConnection();
       File file = new File(currentPath + "\\Abiturients_login_request_" + moduleType + "_" + (new SimpleDateFormat("dd.MM.yyyy")).format(new Date()) + ".txt");
       if(!file.exists()) {
@@ -867,7 +878,7 @@ public class OutputExportFiles {
       }
 
       PrintWriter out = new PrintWriter(file.getAbsoluteFile(), "UTF8");
-      if(moduleType.equals("РѕСЂРґРёРЅР°С‚СѓСЂР°")) {
+      if(moduleType.equals("ординатура")) {
          String query_generalInfo = "select\tAbiturient.aid,  isNULL(Abiturient.snils, \'\'),  \'1.2.643.5.1.13.13.12.4.52.55\', CONVERT(varchar, Abiturient.Birthday, 104), isNULL(CONVERT(varchar, AbiturientEntranceTests.testDate, 104), \'\') from\tAbiturient, AbiturientEntranceTests where (Abiturient.aid = AbiturientEntranceTests.aid_abiturient and isNULL(CONVERT(varchar, AbiturientEntranceTests.testDate, 104), \'\') not like \'\' and isNULL(Abiturient.snils, \'\') not in (\'\', \'-\')) order by Abiturient.aid";
          System.out.println(query_generalInfo);
          CallableStatement cstmt = con.prepareCall(query_generalInfo, 1004, 1007);
@@ -904,7 +915,7 @@ public class OutputExportFiles {
    }
 
    public static void printAbiturientsReturnForOrdIS() throws Exception {
-      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"Р°СЃРїРёСЂР°РЅС‚СѓСЂР°":"РѕСЂРґРёРЅР°С‚СѓСЂР°";
+      String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"аспирантура":"ординатура";
       Connection con = ModelDBConnection.getConnection();
       File file = new File(currentPath + "\\Abiturients_IS_Return_" + moduleType + "_" + (new SimpleDateFormat("dd.MM.yyyy")).format(new Date()) + ".txt");
       if(!file.exists()) {
@@ -912,8 +923,8 @@ public class OutputExportFiles {
       }
 
       PrintWriter out = new PrintWriter(file.getAbsoluteFile(), "UTF8");
-      if(moduleType.equals("РѕСЂРґРёРЅР°С‚СѓСЂР°")) {
-         String query_generalInfo = "select\tAbiturient.aid,  isNULL(Abiturient.snils, \'\'),  isNULL(Abiturient.SName, \'\'),  isNULL(Abiturient.FName, \'\'),  isNULL(Abiturient.MName, \'\'), \'1.2.643.5.1.13.13.12.4.52.55\', \'2\', CONVERT(varchar, Abiturient.Birthday, 104), Nationality.name, Speciality.codeByStandart, case when AbiturientCompetitiveGroup.competitiveGroup in (1,2) then \'Р±СЋРґР¶РµС‚\' else \'РґРѕРіРѕРІРѕСЂ\' end, CONVERT(varchar, Abiturient.registrationDate, 104), case when AbiturientCompetitiveGroup.competitiveGroup in (1) then \'РґР°\' else \'РЅРµС‚\' end from\tAbiturient,  AbiturientCompetitiveGroup, Speciality, Nationality  where\t(Abiturient.aid = AbiturientCompetitiveGroup.aid_abiturient and Speciality.id = AbiturientCompetitiveGroup.speciality and Abiturient.id_nationality = Nationality.id and Abiturient.returnDate is not null)  order by Abiturient.aid";
+      if(moduleType.equals("ординатура")) {
+         String query_generalInfo = "select\tAbiturient.aid,  isNULL(Abiturient.snils, \'\'),  isNULL(Abiturient.SName, \'\'),  isNULL(Abiturient.FName, \'\'),  isNULL(Abiturient.MName, \'\'), \'1.2.643.5.1.13.13.12.4.52.55\', \'2\', CONVERT(varchar, Abiturient.Birthday, 104), Nationality.name, Speciality.codeByStandart, case when AbiturientCompetitiveGroup.competitiveGroup in (1,2) then \'бюджет\' else \'договор\' end, CONVERT(varchar, Abiturient.registrationDate, 104), case when AbiturientCompetitiveGroup.competitiveGroup in (1) then \'да\' else \'нет\' end from\tAbiturient,  AbiturientCompetitiveGroup, Speciality, Nationality  where\t(Abiturient.aid = AbiturientCompetitiveGroup.aid_abiturient and Speciality.id = AbiturientCompetitiveGroup.speciality and Abiturient.id_nationality = Nationality.id and Abiturient.returnDate is not null)  order by Abiturient.aid";
          CallableStatement cstmt = con.prepareCall(query_generalInfo, 1004, 1007);
          ResultSet rset = cstmt.executeQuery();
          int countOfAbiturientss = rset.last()?rset.getRow():0;
