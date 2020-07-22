@@ -1171,7 +1171,7 @@ public class OutputCompetition {
                   // платники и иностранцы
                };
 
-               if((competitiveGroups[cg_i][0].equals("3") || competitiveGroups[cg_i][0].equals("4") || competitiveGroups[cg_i][0].equals("5")) && (!wasWritten)) {
+               if(competitiveGroups[cg_i][0].equals("3") || competitiveGroups[cg_i][0].equals("4") || competitiveGroups[cg_i][0].equals("5")) {
                   query = moduleType.equals("аспирантура")?"select aid, SName, Fname, isNULL(MName,\'\'), competitiveBall, case when originalsReceivedDate is not null then \'+\' else \'-\' end, Speciality.name, case when returnDate is not null then \'+\' else \'-\' end, EducationForm.name, (select sum(isNULL(score, 0)) from AbiturientEntranceTests where AbiturientCompetitiveGroup.aid_abiturient = AbiturientEntranceTests.aid_abiturient) as entranceTestsSum from (Speciality join AbiturientCompetitiveGroup on (AbiturientCompetitiveGroup.speciality = Speciality.id) join Abiturient on (AbiturientCompetitiveGroup.aid_abiturient = Abiturient.aid) join EducationForm on (AbiturientCompetitiveGroup.educationForm = EducationForm.id)) left outer join ReturnReasons on (ReturnReasons.id = Abiturient.id_returnReason) where course = \'" + specialities[path][0] + "\' and competitiveGroup = \'" + competitiveGroups[cg_i][0] + "\' and targetOrganisation is null " + (forInternalNeeds?"":"and AbiturientCompetitiveGroup.markEnrollment > -1 ") + "order by competitiveBall desc, entranceTestsSum desc":"select aid, SName, Fname, isNULL(MName,\'\'), competitiveBall, case when originalsReceivedDate is not null then \'+\' else \'-\' end, case when returnDate is not null then \'+\' else \'-\' end, EducationStandard.name, (select sum(isNULL(score, 0)) from AbiturientEntranceTests where AbiturientCompetitiveGroup.aid_abiturient = AbiturientEntranceTests.aid_abiturient) as entranceTestsSum, (select isNull(avgBall, 0) from AbiturientHigherEducation where AbiturientCompetitiveGroup.aid_abiturient = AbiturientHigherEducation.aid_abiturient) as avgDiplomaBall, Chair.name from (Chair join AbiturientCompetitiveGroup on (AbiturientCompetitiveGroup.chair = Chair.id) join Abiturient on (AbiturientCompetitiveGroup.aid_abiturient = Abiturient.aid) join EducationStandard on (AbiturientCompetitiveGroup.educationStandard = EducationStandard.id)) left outer join ReturnReasons on (ReturnReasons.id = Abiturient.id_returnReason) where speciality = \'" + specialities[path][0] + "\' and competitiveGroup = \'" + competitiveGroups[cg_i][0] + "\' " + (forInternalNeeds?"":"and AbiturientCompetitiveGroup.markEnrollment > -1 ") + "order by competitiveBall desc, entranceTestsSum desc, avgDiplomaBall desc";
                   cstmt = con.prepareCall(query, 1004, 1007);
                   rset = cstmt.executeQuery();
@@ -1183,7 +1183,7 @@ public class OutputCompetition {
                      row.createCell(1).setCellValue("МЕСТА ПО ДОГОВОРАМ ОБ ОКАЗАНИИ ПЛАТНЫХ УСЛУГ");
                      sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 1, 9));
                      row.getCell(1).setCellStyle(styleForCategories);
-                     wasWritten = true;
+                     //wasWritten = true;
                   }
 
                   for(es_i = 0; es_i < educationStandarts.length; ++es_i) {
@@ -1207,7 +1207,7 @@ public class OutputCompetition {
 
                         row.getCell(1).setCellStyle(styleForTargetOrgs);
                         ++rowNum;
-                        //row = sheet.createRow(rowNum++);
+                        row = sheet.createRow(rowNum++);
                         var45 = false;
                         if(moduleType.equals("аспирантура")) {
                            row.createCell(0).setCellValue("№п/п");
