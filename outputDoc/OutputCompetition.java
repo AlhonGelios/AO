@@ -1169,14 +1169,15 @@ public class OutputCompetition {
 
                   }
                   // платники и иностранцы
-               } 
-               else {
+               };
+
+               if((competitiveGroups[cg_i][0].equals("3") || competitiveGroups[cg_i][0].equals("4") || competitiveGroups[cg_i][0].equals("5")) && (!wasWritten)) {
                   query = moduleType.equals("аспирантура")?"select aid, SName, Fname, isNULL(MName,\'\'), competitiveBall, case when originalsReceivedDate is not null then \'+\' else \'-\' end, Speciality.name, case when returnDate is not null then \'+\' else \'-\' end, EducationForm.name, (select sum(isNULL(score, 0)) from AbiturientEntranceTests where AbiturientCompetitiveGroup.aid_abiturient = AbiturientEntranceTests.aid_abiturient) as entranceTestsSum from (Speciality join AbiturientCompetitiveGroup on (AbiturientCompetitiveGroup.speciality = Speciality.id) join Abiturient on (AbiturientCompetitiveGroup.aid_abiturient = Abiturient.aid) join EducationForm on (AbiturientCompetitiveGroup.educationForm = EducationForm.id)) left outer join ReturnReasons on (ReturnReasons.id = Abiturient.id_returnReason) where course = \'" + specialities[path][0] + "\' and competitiveGroup = \'" + competitiveGroups[cg_i][0] + "\' and targetOrganisation is null " + (forInternalNeeds?"":"and AbiturientCompetitiveGroup.markEnrollment > -1 ") + "order by competitiveBall desc, entranceTestsSum desc":"select aid, SName, Fname, isNULL(MName,\'\'), competitiveBall, case when originalsReceivedDate is not null then \'+\' else \'-\' end, case when returnDate is not null then \'+\' else \'-\' end, EducationStandard.name, (select sum(isNULL(score, 0)) from AbiturientEntranceTests where AbiturientCompetitiveGroup.aid_abiturient = AbiturientEntranceTests.aid_abiturient) as entranceTestsSum, (select isNull(avgBall, 0) from AbiturientHigherEducation where AbiturientCompetitiveGroup.aid_abiturient = AbiturientHigherEducation.aid_abiturient) as avgDiplomaBall, Chair.name from (Chair join AbiturientCompetitiveGroup on (AbiturientCompetitiveGroup.chair = Chair.id) join Abiturient on (AbiturientCompetitiveGroup.aid_abiturient = Abiturient.aid) join EducationStandard on (AbiturientCompetitiveGroup.educationStandard = EducationStandard.id)) left outer join ReturnReasons on (ReturnReasons.id = Abiturient.id_returnReason) where speciality = \'" + specialities[path][0] + "\' and competitiveGroup = \'" + competitiveGroups[cg_i][0] + "\' " + (forInternalNeeds?"":"and AbiturientCompetitiveGroup.markEnrollment > -1 ") + "order by competitiveBall desc, entranceTestsSum desc, avgDiplomaBall desc";
                   cstmt = con.prepareCall(query, 1004, 1007);
                   rset = cstmt.executeQuery();
                   countAbitsOnCurSpecOnCurCompGr = rset.last()?rset.getRow():0;
                   rset.close();
-                  if(countAbitsOnCurSpecOnCurCompGr > 0 && (competitiveGroups[cg_i][0].equals("3") || !wasWritten && competitiveGroups[cg_i][0].equals("4"))) {
+                  if(countAbitsOnCurSpecOnCurCompGr > 0) {
                      row = sheet.createRow(rowNum++);
                      row = sheet.createRow(rowNum++);
                      row.createCell(1).setCellValue("МЕСТА ПО ДОГОВОРАМ ОБ ОКАЗАНИИ ПЛАТНЫХ УСЛУГ");
@@ -1193,7 +1194,7 @@ public class OutputCompetition {
                      rset.beforeFirst();
                      if(countAbitsOnCurSpecOnCurCompGrAndSt > 0) {
                         var42 = 1;
-                        //row = sheet.createRow(rowNum++);
+                        row = sheet.createRow(rowNum++);
                         row = sheet.createRow(rowNum++);
                         if(moduleType.equals("аспирантура")) {
                            row.createCell(1).setCellValue("Форма обучения: " + educationStandarts[es_i][1]);
@@ -1206,7 +1207,7 @@ public class OutputCompetition {
 
                         row.getCell(1).setCellStyle(styleForTargetOrgs);
                         ++rowNum;
-                        row = sheet.createRow(rowNum++);
+                        //row = sheet.createRow(rowNum++);
                         var45 = false;
                         if(moduleType.equals("аспирантура")) {
                            row.createCell(0).setCellValue("№п/п");
