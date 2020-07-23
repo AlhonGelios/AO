@@ -1206,7 +1206,7 @@ public class OutputCompetition {
                         }
 
                         row.getCell(1).setCellStyle(styleForTargetOrgs);
-                        ++rowNum;
+                        //++rowNum;
                         row = sheet.createRow(rowNum++);
                         var45 = false;
                         if(moduleType.equals("аспирантура")) {
