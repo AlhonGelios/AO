@@ -833,7 +833,7 @@ public class OutputExportFiles {
 
       PrintWriter out = new PrintWriter(file.getAbsoluteFile(), "UTF8");
       if(moduleType.equals("ординатура")) {
-         String query_generalInfo = "select\tAbiturient.aid,  isNULL(Abiturient.snils, \'\'),  \'1.2.643.5.1.13.13.12.4.52.55\', CONVERT(varchar, Abiturient.Birthday, 104) from\tAbiturient order by Abiturient.aid";
+         String query_generalInfo = "select\tAbiturient.aid,  isNULL(Abiturient.snils, \'\'),  \'1.2.643.5.1.13.13.12.4.52.55\', CONVERT(varchar, Abiturient.Birthday, 104) from\tAbiturient join AbiturientEntranceTests on AbiturientEntranceTests.aid_abiturient = Abiturient.aid where snils != 11111111111 and testDate = '12/08/2020' and returnDate is null order by Abiturient.aid";
          CallableStatement cstmt = con.prepareCall(query_generalInfo, 1004, 1007);
          ResultSet rset = cstmt.executeQuery();
          int countOfAbiturientss = rset.last()?rset.getRow():0;
@@ -917,14 +917,14 @@ public class OutputExportFiles {
    public static void printAbiturientsReturnForOrdIS() throws Exception {
       String moduleType = ModelDBConnection.getDBName().equals("Aspirant")?"аспирантура":"ординатура";
       Connection con = ModelDBConnection.getConnection();
-      File file = new File(currentPath + "\\Abiturients_IS_Return_" + moduleType + "_" + (new SimpleDateFormat("dd.MM.yyyy")).format(new Date()) + ".txt");
+      File file = new File(currentPath + "\\Abiturients_IS_Return_" + moduleType + "_" + (new SimpleDateFormat("dd.MM.yyyy")).format(new Date()) + ".csv");
       if(!file.exists()) {
          file.createNewFile();
       }
 
       PrintWriter out = new PrintWriter(file.getAbsoluteFile(), "UTF8");
       if(moduleType.equals("ординатура")) {
-         String query_generalInfo = "select\tAbiturient.aid,  isNULL(Abiturient.snils, \'\'),  isNULL(Abiturient.SName, \'\'),  isNULL(Abiturient.FName, \'\'),  isNULL(Abiturient.MName, \'\'), \'1.2.643.5.1.13.13.12.4.52.55\', \'2\', CONVERT(varchar, Abiturient.Birthday, 104), Nationality.name, Speciality.codeByStandart, case when AbiturientCompetitiveGroup.competitiveGroup in (1,2) then \'бюджет\' else \'договор\' end, CONVERT(varchar, Abiturient.registrationDate, 104), case when AbiturientCompetitiveGroup.competitiveGroup in (1) then \'да\' else \'нет\' end from\tAbiturient,  AbiturientCompetitiveGroup, Speciality, Nationality  where\t(Abiturient.aid = AbiturientCompetitiveGroup.aid_abiturient and Speciality.id = AbiturientCompetitiveGroup.speciality and Abiturient.id_nationality = Nationality.id and Abiturient.returnDate is not null)  order by Abiturient.aid";
+         String query_generalInfo = "select\tAbiturient.aid,  isNULL(Abiturient.snils, \'\'),  isNULL(Abiturient.SName, \'\'),  isNULL(Abiturient.FName, \'\'),  isNULL(Abiturient.MName, \'\'), \'1.2.643.5.1.13.13.12.4.52.55\', \'3\', CONVERT(varchar, Abiturient.Birthday, 104), Nationality.name, Speciality.codeByStandart, case when AbiturientCompetitiveGroup.competitiveGroup in (1,2,6,7,8,9,10,11,12,13,14,15,16,17) then \'бюджет\' else \'договор\' end, CONVERT(varchar, Abiturient.registrationDate, 104), case when AbiturientCompetitiveGroup.competitiveGroup in (1,6,7,8,9,10,11,12,13,14,15,16,17) then \'да\' else \'нет\' end from\tAbiturient,  AbiturientCompetitiveGroup, Speciality, Nationality  where\t(Abiturient.aid = AbiturientCompetitiveGroup.aid_abiturient and Speciality.id = AbiturientCompetitiveGroup.speciality and Abiturient.id_nationality = Nationality.id and Abiturient.returnDate is not null) and snils != 11111111111  order by Abiturient.aid";
          CallableStatement cstmt = con.prepareCall(query_generalInfo, 1004, 1007);
          ResultSet rset = cstmt.executeQuery();
          int countOfAbiturientss = rset.last()?rset.getRow():0;
@@ -940,7 +940,7 @@ public class OutputExportFiles {
                out.print(rset.getString(10) + ";");
                out.print(rset.getString(11) + ";");
                out.print(rset.getString(13) + ";");
-               out.print(rset.getString(12) + ";1");
+               out.println(rset.getString(12) + ";1");
             }
          }
 

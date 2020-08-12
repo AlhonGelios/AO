@@ -1530,6 +1530,7 @@ public class OutputCompetition {
       String[][] allEntranceTestNames = ModelDBConnection.getAllFromTableOrderedById("EntranceTest");
 
       for(int path = 0; path < specialities.length; ++path) {
+         boolean flag = false;
          boolean wasWritten = false;
          String query = moduleType.equals("аспирантура")?"select * from AbiturientCompetitiveGroup where course = \'" + specialities[path][0] + "\' and AbiturientCompetitiveGroup.markEnrollment > 0 ":"select * from AbiturientCompetitiveGroup where speciality = \'" + specialities[path][0] + "\' and AbiturientCompetitiveGroup.markEnrollment > 0 ";
          cstmt = con.prepareCall(query, 1004, 1007);
@@ -1559,8 +1560,8 @@ public class OutputCompetition {
                int var47;
                String[][] var48;
                String[][] var50;
-               if(competitiveGroups[cg_i][0].equals("1")) {
-                  query = moduleType.equals("аспирантура")?"select * from AbiturientCompetitiveGroup where course = \'" + specialities[path][0] + "\' and competitiveGroup in (1,2) and AbiturientCompetitiveGroup.markEnrollment > 0 ":"select * from AbiturientCompetitiveGroup where speciality = \'" + specialities[path][0] + "\' and competitiveGroup in (1,2) and AbiturientCompetitiveGroup.markEnrollment > 0 ";
+               if((!competitiveGroups[cg_i][0].equals("3") || !competitiveGroups[cg_i][0].equals("4") || !competitiveGroups[cg_i][0].equals("5")) && (!flag)) {
+                  query = moduleType.equals("аспирантура")?"select * from AbiturientCompetitiveGroup where course = \'" + specialities[path][0] + "\' and competitiveGroup in (1,2) and AbiturientCompetitiveGroup.markEnrollment > 0 ":"select * from AbiturientCompetitiveGroup where speciality = \'" + specialities[path][0] + "\' and competitiveGroup = \'" + cg_i + "\' and AbiturientCompetitiveGroup.markEnrollment > 0 ";
                   cstmt = con.prepareCall(query, 1004, 1007);
                   rset = cstmt.executeQuery();
                   countAbitsOnCurSpecOnCurCompGr = rset.last()?rset.getRow():0;
@@ -1570,447 +1571,459 @@ public class OutputCompetition {
                      row.createCell(1).setCellValue("МЕСТА В РАМКАХ КЦП");
                      sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 1, 9));
                      row.getCell(1).setCellStyle(styleForCategories);
-                  }
-
-                  query = moduleType.equals("аспирантура")?"select * from AbiturientCompetitiveGroup where course = \'" + specialities[path][0] + "\' and targetOrganisation is not null and AbiturientCompetitiveGroup.markEnrollment > 0 ":"select * from AbiturientCompetitiveGroup where speciality = \'" + specialities[path][0] + "\' and targetOrganisation is not null and AbiturientCompetitiveGroup.markEnrollment > 0 ";
-                  cstmt = con.prepareCall(query, 1004, 1007);
-                  rset = cstmt.executeQuery();
-                  es_i = rset.last()?rset.getRow():0;
-                  rset.close();
-                  if(es_i > 0) {
-                     row = sheet.createRow(rowNum++);
-                     row.createCell(1).setCellValue("места по целевому приему");
-                     row.getCell(1).setCellStyle(styleForTargetOrgs);
-                     if(!moduleType.equals("аспирантура")) {
-                        var41 = 1;
-                        query = "select aid, SName, Fname, isNULL(MName,\'\'), competitiveBall, case when originalsReceivedDate is not null then \'+\' else \'-\' end, case when returnDate is not null then \'+\' else \'-\' end, (select sum(isNULL(score, 0)) from AbiturientEntranceTests where AbiturientCompetitiveGroup.aid_abiturient = AbiturientEntranceTests.aid_abiturient) as entranceTestsSum, (select isNull(avgBall, 0) from AbiturientHigherEducation where AbiturientCompetitiveGroup.aid_abiturient = AbiturientHigherEducation.aid_abiturient) as avgDiplomaBall, Chair.name, TargetOrganisation.name from (Chair join AbiturientCompetitiveGroup on (AbiturientCompetitiveGroup.chair = Chair.id) join TargetOrganisation on (AbiturientCompetitiveGroup.targetOrganisation = TargetOrganisation.id) join Abiturient on (AbiturientCompetitiveGroup.aid_abiturient = Abiturient.aid)) left outer join ReturnReasons on (ReturnReasons.id = Abiturient.id_returnReason) where speciality = \'" + specialities[path][0] + "\' and targetOrganisation is not null " + "and AbiturientCompetitiveGroup.markEnrollment > 0 " + "order by competitiveBall desc, entranceTestsSum desc, avgDiplomaBall desc";
+                     flag = true;
+                  
+                     for (int to_i = 0; to_i < targetOrganisations.length; ++to_i) {
+                        query = moduleType.equals("аспирантура")?"select * from AbiturientCompetitiveGroup where course = \'" + specialities[path][0] + "\' and targetOrganisation is not null and AbiturientCompetitiveGroup.markEnrollment > 0 ":"select * from AbiturientCompetitiveGroup where speciality = \'" + specialities[path][0] + "\' and targetOrganisation = \'" + targetOrganisations[to_i][0] + "\' and AbiturientCompetitiveGroup.markEnrollment > 0 ";
                         cstmt = con.prepareCall(query, 1004, 1007);
                         rset = cstmt.executeQuery();
-                        countAbitsOnCurSpecOnCurCompGrAndSt = rset.last()?rset.getRow():0;
-                        rset.beforeFirst();
-                        if(countAbitsOnCurSpecOnCurCompGrAndSt > 0) {
+                        es_i = rset.last()?rset.getRow():0;
+                        rset.close();
+                        if(es_i > 0) {
                            row = sheet.createRow(rowNum++);
-                           row = sheet.createRow(rowNum++);
-                           var44 = false;
-                           if(moduleType.equals("аспирантура")) {
-                              row.createCell(0).setCellValue("№п/п");
-                              row.getCell(0).setCellStyle(styleForNames);
-                              row.createCell(1).setCellValue("№ЛД");
-                              row.getCell(1).setCellStyle(styleForNames);
-                              row.createCell(2).setCellValue("ФИО");
-                              row.getCell(2).setCellStyle(styleForNames);
-                              row.createCell(3).setCellValue("Конкурсный балл");
-                              row.getCell(3).setCellStyle(styleForNames);
-                              var45 = 4;
-
-                              for(var47 = 0; var47 < allEntranceTestNames.length; ++var47) {
-                                 row.createCell(var45 + var47).setCellValue(allEntranceTestNames[var47][1]);
-                                 row.getCell(var45 + var47).setCellStyle(styleForNames);
-                              }
-
-                              curCellNum = var45 + allEntranceTestNames.length;
-                              row.createCell(curCellNum).setCellValue("Балл за ИД");
-                              row.getCell(curCellNum).setCellStyle(styleForNames);
-                              ++curCellNum;
-                              row.createCell(curCellNum).setCellValue("Наличие оригинала/согласия на зачисление");
-                              row.getCell(curCellNum).setCellStyle(styleForNames);
-                              ++curCellNum;
-                              row.createCell(curCellNum).setCellValue("Специальность");
-                              row.getCell(curCellNum).setCellStyle(styleForNames);
-                              ++curCellNum;
-                              row.createCell(curCellNum).setCellValue("Забрал документы");
-                              row.getCell(curCellNum).setCellStyle(styleForNames);
-                              ++curCellNum;
-                           } else {
-                              row.createCell(0).setCellValue("№п/п");
-                              row.getCell(0).setCellStyle(styleForNames);
-                              row.createCell(1).setCellValue("№ЛД");
-                              row.getCell(1).setCellStyle(styleForNames);
-                              row.createCell(2).setCellValue("ФИО");
-                              row.getCell(2).setCellStyle(styleForNames);
-                              row.createCell(3).setCellValue("Конкурсный балл");
-                              row.getCell(3).setCellStyle(styleForNames);
-                              var45 = 4;
-
-                              for(var47 = 0; var47 < allEntranceTestNames.length; ++var47) {
-                                 row.createCell(var45 + var47).setCellValue(allEntranceTestNames[var47][1]);
-                                 row.getCell(var45 + var47).setCellStyle(styleForNames);
-                              }
-
-                              curCellNum = var45 + allEntranceTestNames.length;
-                              row.createCell(curCellNum).setCellValue("Балл за ИД");
-                              row.getCell(curCellNum).setCellStyle(styleForNames);
-                              ++curCellNum;
-                              row.createCell(curCellNum).setCellValue("Средний балл по диплому");
-                              row.getCell(curCellNum).setCellStyle(styleForNames);
-                              ++curCellNum;
-                              row.createCell(curCellNum).setCellValue("Наличие оригинала/согласия на зачисление");
-                              row.getCell(curCellNum).setCellStyle(styleForNames);
-                              ++curCellNum;
-                              row.createCell(curCellNum).setCellValue("Кафедра");
-                              row.getCell(curCellNum).setCellStyle(styleForNames);
-                              ++curCellNum;
-                              row.createCell(curCellNum).setCellValue("Забрал документы");
-                              row.getCell(curCellNum).setCellStyle(styleForNames);
-                              ++curCellNum;
-                              row.createCell(curCellNum).setCellValue("Целевая организация");
-                              row.getCell(curCellNum).setCellStyle(styleForNames);
-                              ++curCellNum;
-                           }
-
-                           while(rset.next()) {
-                              row = sheet.createRow(rowNum++);
-                              if(moduleType.equals("аспирантура")) {
-                                 row.createCell(0).setCellValue((double)(var41++));
-                                 row.getCell(0).setCellStyle(styleForCellsWithCenterAlg);
-                                 row.createCell(1).setCellValue((double)rset.getInt(1));
-                                 row.getCell(1).setCellStyle(styleForCellsWithCenterAlg);
-                                 row.createCell(2).setCellValue(vinitPadeg?Padeg.getFIOPadegFSAS(rset.getString(2) + " " + rset.getString(3) + " " + rset.getString(4), 4):rset.getString(2) + " " + rset.getString(3) + " " + rset.getString(4));
-                                 row.getCell(2).setCellStyle(styleForCells);
-                                 row.createCell(3).setCellValue((double)rset.getInt(5));
-                                 row.getCell(3).setCellStyle(styleForCellsWithCenterAlg);
-                                 var50 = ModelDBConnection.getAllEntranceTestsResultsByAbiturientId(String.valueOf(rset.getInt(1)), false);
-                                 var45 = 4;
-
-                                 for(abitAllIndAchivments = 0; abitAllIndAchivments < allEntranceTestNames.length; ++abitAllIndAchivments) {
-                                    for(indAchSum = 0; indAchSum < var50.length; ++indAchSum) {
-                                       if(allEntranceTestNames[abitAllIndAchivments][1].equals(var50[indAchSum][0])) {
-                                          row.createCell(var45 + abitAllIndAchivments).setCellValue(var50[indAchSum][4]);
-                                          row.getCell(var45 + abitAllIndAchivments).setCellStyle(styleForCellsWithCenterAlg);
-                                          break;
-                                       }
-                                    }
-                                 }
-
-                                 curCellNum = var45 + allEntranceTestNames.length;
-                                 var48 = ModelDBConnection.getAllAchievmentsByAbiturientId(String.valueOf(rset.getInt(1)), true);
-                                 indAchSum = 0;
+                           row.createCell(1).setCellValue("места по целевому приему:"  + targetOrganisations[to_i][1]);
+                           row.getCell(1).setCellStyle(styleForTargetOrgs);
+                           if(!moduleType.equals("аспирантура")) {
+                              var41 = 1;
+                              query = "select aid, SName, Fname, isNULL(MName,\'\'), competitiveBall, case when originalsReceivedDate is not null then \'+\' else \'-\' end, case when returnDate is not null then \'+\' else \'-\' end, (select sum(isNULL(score, 0)) from AbiturientEntranceTests where AbiturientCompetitiveGroup.aid_abiturient = AbiturientEntranceTests.aid_abiturient) as entranceTestsSum, (select isNull(avgBall, 0) from AbiturientHigherEducation where AbiturientCompetitiveGroup.aid_abiturient = AbiturientHigherEducation.aid_abiturient) as avgDiplomaBall, Chair.name, TargetOrganisation.name from (Chair join AbiturientCompetitiveGroup on (AbiturientCompetitiveGroup.chair = Chair.id) join TargetOrganisation on (AbiturientCompetitiveGroup.targetOrganisation = TargetOrganisation.id) join Abiturient on (AbiturientCompetitiveGroup.aid_abiturient = Abiturient.aid)) left outer join ReturnReasons on (ReturnReasons.id = Abiturient.id_returnReason) where speciality = \'" + specialities[path][0] + "\' and targetOrganisation = \'" + targetOrganisations[to_i][0] + "\' " + "and AbiturientCompetitiveGroup.markEnrollment > 0 " + "order by competitiveBall desc, entranceTestsSum desc, avgDiplomaBall desc";
+                              cstmt = con.prepareCall(query, 1004, 1007);
+                              rset = cstmt.executeQuery();
+                              countAbitsOnCurSpecOnCurCompGrAndSt = rset.last()?rset.getRow():0;
+                              rset.beforeFirst();
+                              if(countAbitsOnCurSpecOnCurCompGrAndSt > 0) {
+                                 row = sheet.createRow(rowNum++);
+                                 row = sheet.createRow(rowNum++);
+                                 var44 = false;
                                  if(moduleType.equals("аспирантура")) {
-                                    for(baseAchSum = 0; baseAchSum < (var48 == null?0:var48.length); ++baseAchSum) {
-                                       indAchSum += Integer.valueOf(var48[baseAchSum][2]).intValue();
+                                    row.createCell(0).setCellValue("№п/п");
+                                    row.getCell(0).setCellStyle(styleForNames);
+                                    row.createCell(1).setCellValue("№ЛД");
+                                    row.getCell(1).setCellStyle(styleForNames);
+                                    row.createCell(2).setCellValue("ФИО");
+                                    row.getCell(2).setCellStyle(styleForNames);
+                                    row.createCell(3).setCellValue("Конкурсный балл");
+                                    row.getCell(3).setCellStyle(styleForNames);
+                                    var45 = 4;
+
+                                    for(var47 = 0; var47 < allEntranceTestNames.length; ++var47) {
+                                       row.createCell(var45 + var47).setCellValue(allEntranceTestNames[var47][1]);
+                                       row.getCell(var45 + var47).setCellStyle(styleForNames);
                                     }
+
+                                    curCellNum = var45 + allEntranceTestNames.length;
+                                    row.createCell(curCellNum).setCellValue("Балл за ИД");
+                                    row.getCell(curCellNum).setCellStyle(styleForNames);
+                                    ++curCellNum;
+                                    row.createCell(curCellNum).setCellValue("Наличие оригинала/согласия на зачисление");
+                                    row.getCell(curCellNum).setCellStyle(styleForNames);
+                                    ++curCellNum;
+                                    row.createCell(curCellNum).setCellValue("Специальность");
+                                    row.getCell(curCellNum).setCellStyle(styleForNames);
+                                    ++curCellNum;
+                                    row.createCell(curCellNum).setCellValue("Забрал документы");
+                                    row.getCell(curCellNum).setCellStyle(styleForNames);
+                                    ++curCellNum;
                                  } else {
-                                    baseAchSum = 0;
-                                    additionalAchSum = 0;
+                                    row.createCell(0).setCellValue("№п/п");
+                                    row.getCell(0).setCellStyle(styleForNames);
+                                    row.createCell(1).setCellValue("№ЛД");
+                                    row.getCell(1).setCellStyle(styleForNames);
+                                    row.createCell(2).setCellValue("ФИО");
+                                    row.getCell(2).setCellStyle(styleForNames);
+                                    row.createCell(3).setCellValue("Конкурсный балл");
+                                    row.getCell(3).setCellStyle(styleForNames);
+                                    var45 = 4;
 
-                                    for(curIndAchNum = 0; curIndAchNum < (var48 == null?0:var48.length); ++curIndAchNum) {
-                                       if(Integer.valueOf(var48[curIndAchNum][1]).intValue() <= 5) {
-                                          baseAchSum += Integer.valueOf(var48[curIndAchNum][2]).intValue();
-                                       } else {
-                                          additionalAchSum += Integer.valueOf(var48[curIndAchNum][2]).intValue();
-                                       }
+                                    for(var47 = 0; var47 < allEntranceTestNames.length; ++var47) {
+                                       row.createCell(var45 + var47).setCellValue(allEntranceTestNames[var47][1]);
+                                       row.getCell(var45 + var47).setCellStyle(styleForNames);
                                     }
 
-                                    indAchSum = baseAchSum + (additionalAchSum > 15?15:additionalAchSum);
-                                    indAchSum = indAchSum > 100?100:indAchSum;
+                                    curCellNum = var45 + allEntranceTestNames.length;
+                                    row.createCell(curCellNum).setCellValue("Балл за ИД");
+                                    row.getCell(curCellNum).setCellStyle(styleForNames);
+                                    ++curCellNum;
+                                    row.createCell(curCellNum).setCellValue("Средний балл по диплому");
+                                    row.getCell(curCellNum).setCellStyle(styleForNames);
+                                    ++curCellNum;
+                                    row.createCell(curCellNum).setCellValue("Наличие оригинала/согласия на зачисление");
+                                    row.getCell(curCellNum).setCellStyle(styleForNames);
+                                    ++curCellNum;
+                                    row.createCell(curCellNum).setCellValue("Кафедра");
+                                    row.getCell(curCellNum).setCellStyle(styleForNames);
+                                    ++curCellNum;
+                                    row.createCell(curCellNum).setCellValue("Забрал документы");
+                                    row.getCell(curCellNum).setCellStyle(styleForNames);
+                                    ++curCellNum;
+                                    row.createCell(curCellNum).setCellValue("Целевая организация");
+                                    row.getCell(curCellNum).setCellStyle(styleForNames);
+                                    ++curCellNum;
                                  }
 
-                                 row.createCell(curCellNum).setCellValue((double)indAchSum);
-                                 row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
-                                 ++curCellNum;
-                                 row.createCell(curCellNum).setCellValue(rset.getString(6));
-                                 row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
-                                 ++curCellNum;
-                                 row.createCell(curCellNum).setCellValue(rset.getString(7));
-                                 row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
-                                 ++curCellNum;
-                                 row.createCell(curCellNum).setCellValue(rset.getString(8));
-                                 row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
-                              } else {
-                                 row.createCell(0).setCellValue((double)(var41++));
-                                 row.getCell(0).setCellStyle(styleForCellsWithCenterAlg);
-                                 row.createCell(1).setCellValue((double)rset.getInt(1));
-                                 row.getCell(1).setCellStyle(styleForCellsWithCenterAlg);
-                                 row.createCell(2).setCellValue(vinitPadeg?Padeg.getFIOPadegFSAS(rset.getString(2) + " " + rset.getString(3) + " " + rset.getString(4), 4):rset.getString(2) + " " + rset.getString(3) + " " + rset.getString(4));
-                                 row.getCell(2).setCellStyle(styleForCells);
-                                 row.createCell(3).setCellValue((double)rset.getInt(5));
-                                 row.getCell(3).setCellStyle(styleForCellsWithCenterAlg);
-                                 var50 = ModelDBConnection.getAllEntranceTestsResultsByAbiturientId(String.valueOf(rset.getInt(1)), false);
-                                 var45 = 4;
-                                 abitAllIndAchivments = 0;
+                                 while(rset.next()) {
+                                    row = sheet.createRow(rowNum++);
+                                    if(moduleType.equals("аспирантура")) {
+                                       row.createCell(0).setCellValue((double)(var41++));
+                                       row.getCell(0).setCellStyle(styleForCellsWithCenterAlg);
+                                       row.createCell(1).setCellValue((double)rset.getInt(1));
+                                       row.getCell(1).setCellStyle(styleForCellsWithCenterAlg);
+                                       row.createCell(2).setCellValue(vinitPadeg?Padeg.getFIOPadegFSAS(rset.getString(2) + " " + rset.getString(3) + " " + rset.getString(4), 4):rset.getString(2) + " " + rset.getString(3) + " " + rset.getString(4));
+                                       row.getCell(2).setCellStyle(styleForCells);
+                                       row.createCell(3).setCellValue((double)rset.getInt(5));
+                                       row.getCell(3).setCellStyle(styleForCellsWithCenterAlg);
+                                       var50 = ModelDBConnection.getAllEntranceTestsResultsByAbiturientId(String.valueOf(rset.getInt(1)), false);
+                                       var45 = 4;
 
-                                 while(abitAllIndAchivments < allEntranceTestNames.length) {
-                                    indAchSum = 0;
+                                       for(abitAllIndAchivments = 0; abitAllIndAchivments < allEntranceTestNames.length; ++abitAllIndAchivments) {
+                                          for(indAchSum = 0; indAchSum < var50.length; ++indAchSum) {
+                                             if(allEntranceTestNames[abitAllIndAchivments][1].equals(var50[indAchSum][0])) {
+                                                row.createCell(var45 + abitAllIndAchivments).setCellValue(var50[indAchSum][4]);
+                                                row.getCell(var45 + abitAllIndAchivments).setCellStyle(styleForCellsWithCenterAlg);
+                                                break;
+                                             }
+                                          }
+                                       }
 
-                                    while(true) {
-                                       if(indAchSum < var50.length) {
-                                          if(!allEntranceTestNames[abitAllIndAchivments][1].equals(var50[indAchSum][0])) {
-                                             ++indAchSum;
-                                             continue;
+                                       curCellNum = var45 + allEntranceTestNames.length;
+                                       var48 = ModelDBConnection.getAllAchievmentsByAbiturientId(String.valueOf(rset.getInt(1)), true);
+                                       indAchSum = 0;
+                                       if(moduleType.equals("аспирантура")) {
+                                          for(baseAchSum = 0; baseAchSum < (var48 == null?0:var48.length); ++baseAchSum) {
+                                             indAchSum += Integer.valueOf(var48[baseAchSum][2]).intValue();
+                                          }
+                                       } else {
+                                          baseAchSum = 0;
+                                          additionalAchSum = 0;
+
+                                          for(curIndAchNum = 0; curIndAchNum < (var48 == null?0:var48.length); ++curIndAchNum) {
+                                             if(Integer.valueOf(var48[curIndAchNum][1]).intValue() <= 5) {
+                                                baseAchSum += Integer.valueOf(var48[curIndAchNum][2]).intValue();
+                                             } else {
+                                                additionalAchSum += Integer.valueOf(var48[curIndAchNum][2]).intValue();
+                                             }
                                           }
 
-                                          row.createCell(var45 + abitAllIndAchivments).setCellValue(var50[indAchSum][4]);
-                                          row.getCell(var45 + abitAllIndAchivments).setCellStyle(styleForCellsWithCenterAlg);
+                                          indAchSum = baseAchSum + (additionalAchSum > 15?15:additionalAchSum);
+                                          indAchSum = indAchSum > 100?100:indAchSum;
                                        }
 
-                                       ++abitAllIndAchivments;
-                                       break;
-                                    }
-                                 }
+                                       row.createCell(curCellNum).setCellValue((double)indAchSum);
+                                       row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
+                                       ++curCellNum;
+                                       row.createCell(curCellNum).setCellValue(rset.getString(6));
+                                       row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
+                                       ++curCellNum;
+                                       row.createCell(curCellNum).setCellValue(rset.getString(7));
+                                       row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
+                                       ++curCellNum;
+                                       row.createCell(curCellNum).setCellValue(rset.getString(8));
+                                       row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
+                                    } else {
+                                       row.createCell(0).setCellValue((double)(var41++));
+                                       row.getCell(0).setCellStyle(styleForCellsWithCenterAlg);
+                                       row.createCell(1).setCellValue((double)rset.getInt(1));
+                                       row.getCell(1).setCellStyle(styleForCellsWithCenterAlg);
+                                       row.createCell(2).setCellValue(vinitPadeg?Padeg.getFIOPadegFSAS(rset.getString(2) + " " + rset.getString(3) + " " + rset.getString(4), 4):rset.getString(2) + " " + rset.getString(3) + " " + rset.getString(4));
+                                       row.getCell(2).setCellStyle(styleForCells);
+                                       row.createCell(3).setCellValue((double)rset.getInt(5));
+                                       row.getCell(3).setCellStyle(styleForCellsWithCenterAlg);
+                                       var50 = ModelDBConnection.getAllEntranceTestsResultsByAbiturientId(String.valueOf(rset.getInt(1)), false);
+                                       var45 = 4;
+                                       abitAllIndAchivments = 0;
 
-                                 curCellNum = var45 + allEntranceTestNames.length;
-                                 var48 = ModelDBConnection.getAllAchievmentsByAbiturientId(String.valueOf(rset.getInt(1)), true);
-                                 indAchSum = 0;
-                                 if(moduleType.equals("аспирантура")) {
-                                    for(baseAchSum = 0; baseAchSum < (var48 == null?0:var48.length); ++baseAchSum) {
-                                       indAchSum += Integer.valueOf(var48[baseAchSum][2]).intValue();
-                                    }
-                                 } else {
-                                    baseAchSum = 0;
-                                    additionalAchSum = 0;
+                                       while(abitAllIndAchivments < allEntranceTestNames.length) {
+                                          indAchSum = 0;
 
-                                    for(curIndAchNum = 0; curIndAchNum < (var48 == null?0:var48.length); ++curIndAchNum) {
-                                       if(Integer.valueOf(var48[curIndAchNum][1]).intValue() <= 5) {
-                                          baseAchSum += Integer.valueOf(var48[curIndAchNum][2]).intValue();
-                                       } else {
-                                          additionalAchSum += Integer.valueOf(var48[curIndAchNum][2]).intValue();
-                                       }
-                                    }
+                                          while(true) {
+                                             if(indAchSum < var50.length) {
+                                                if(!allEntranceTestNames[abitAllIndAchivments][1].equals(var50[indAchSum][0])) {
+                                                   ++indAchSum;
+                                                   continue;
+                                                }
 
-                                    indAchSum = baseAchSum + (additionalAchSum > 15?15:additionalAchSum);
-                                    indAchSum = indAchSum > 100?100:indAchSum;
-                                 }
+                                                row.createCell(var45 + abitAllIndAchivments).setCellValue(var50[indAchSum][4]);
+                                                row.getCell(var45 + abitAllIndAchivments).setCellStyle(styleForCellsWithCenterAlg);
+                                             }
 
-                                 row.createCell(curCellNum).setCellValue((double)indAchSum);
-                                 row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
-                                 ++curCellNum;
-                                 row.createCell(curCellNum).setCellValue(rset.getString(9));
-                                 row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
-                                 ++curCellNum;
-                                 row.createCell(curCellNum).setCellValue(rset.getString(6));
-                                 row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
-                                 ++curCellNum;
-                                 row.createCell(curCellNum).setCellValue(rset.getString(10));
-                                 row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
-                                 ++curCellNum;
-                                 row.createCell(curCellNum).setCellValue(rset.getString(7));
-                                 row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
-                                 ++curCellNum;
-                                 row.createCell(curCellNum).setCellValue(rset.getString(11));
-                                 row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
-                              }
-                           }
-                        }
-
-                        rset.close();
-                     } else {
-                        for(countAbitsOnCurSpecOnCurCompGrAndSt = 0; countAbitsOnCurSpecOnCurCompGrAndSt < targetOrganisations.length; ++countAbitsOnCurSpecOnCurCompGrAndSt) {
-                           var41 = 1;
-                           query = moduleType.equals("аспирантура")?"select aid, SName, Fname, isNULL(MName,\'\'), competitiveBall, case when originalsReceivedDate is not null then \'+\' else \'-\' end, Speciality.name, case when returnDate is not null then \'+\' else \'-\' end, (select sum(isNULL(score, 0)) from AbiturientEntranceTests where AbiturientCompetitiveGroup.aid_abiturient = AbiturientEntranceTests.aid_abiturient) as entranceTestsSum from (Speciality join AbiturientCompetitiveGroup on (AbiturientCompetitiveGroup.speciality = Speciality.id) join Abiturient on (AbiturientCompetitiveGroup.aid_abiturient = Abiturient.aid)) left outer join ReturnReasons on (ReturnReasons.id = Abiturient.id_returnReason) where course = \'" + specialities[path][0] + "\' and targetOrganisation = \'" + targetOrganisations[countAbitsOnCurSpecOnCurCompGrAndSt][0] + "\' " + "and AbiturientCompetitiveGroup.markEnrollment > 0 " + "order by competitiveBall desc, entranceTestsSum desc":"select aid, SName, Fname, isNULL(MName,\'\'), competitiveBall, case when originalsReceivedDate is not null then \'+\' else \'-\' end, case when returnDate is not null then \'+\' else \'-\' end, (select sum(isNULL(score, 0)) from AbiturientEntranceTests where AbiturientCompetitiveGroup.aid_abiturient = AbiturientEntranceTests.aid_abiturient) as entranceTestsSum, (select isNull(avgBall, 0) from AbiturientHigherEducation where AbiturientCompetitiveGroup.aid_abiturient = AbiturientHigherEducation.aid_abiturient) as avgDiplomaBall, Chair.name from (Chair join AbiturientCompetitiveGroup on (AbiturientCompetitiveGroup.chair = Chair.id) join Abiturient on (AbiturientCompetitiveGroup.aid_abiturient = Abiturient.aid)) left outer join ReturnReasons on (ReturnReasons.id = Abiturient.id_returnReason) where speciality = \'" + specialities[path][0] + "\' and targetOrganisation = \'" + targetOrganisations[countAbitsOnCurSpecOnCurCompGrAndSt][0] + "\' " + "and AbiturientCompetitiveGroup.markEnrollment > 0 " + "order by competitiveBall desc, entranceTestsSum desc, avgDiplomaBall desc";
-                           cstmt = con.prepareCall(query, 1004, 1007);
-                           rset = cstmt.executeQuery();
-                           curCellNum = rset.last()?rset.getRow():0;
-                           rset.beforeFirst();
-                           if(curCellNum > 0) {
-                              row = sheet.createRow(rowNum++);
-                              row = sheet.createRow(rowNum++);
-                              row.createCell(0).setCellValue("Целевая организация: " + targetOrganisations[countAbitsOnCurSpecOnCurCompGrAndSt][1]);
-                              sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 4));
-                              row.getCell(0).setCellStyle(styleForTargetOrgs);
-                              row = sheet.createRow(rowNum++);
-                              boolean abitAllEntranceResults = false;
-                              byte var46;
-                              if(moduleType.equals("аспирантура")) {
-                                 row.createCell(0).setCellValue("№п/п");
-                                 row.getCell(0).setCellStyle(styleForNames);
-                                 row.createCell(1).setCellValue("№ЛД");
-                                 row.getCell(1).setCellStyle(styleForNames);
-                                 row.createCell(2).setCellValue("ФИО");
-                                 row.getCell(2).setCellStyle(styleForNames);
-                                 row.createCell(3).setCellValue("Конкурсный балл");
-                                 row.getCell(3).setCellStyle(styleForNames);
-                                 var46 = 4;
-
-                                 for(abitAllIndAchivments = 0; abitAllIndAchivments < allEntranceTestNames.length; ++abitAllIndAchivments) {
-                                    row.createCell(var46 + abitAllIndAchivments).setCellValue(allEntranceTestNames[abitAllIndAchivments][1]);
-                                    row.getCell(var46 + abitAllIndAchivments).setCellStyle(styleForNames);
-                                 }
-
-                                 var47 = var46 + allEntranceTestNames.length;
-                                 row.createCell(var47).setCellValue("Балл за ИД");
-                                 row.getCell(var47).setCellStyle(styleForNames);
-                                 ++var47;
-                                 row.createCell(var47).setCellValue("Наличие оригинала/согласия на зачисление");
-                                 row.getCell(var47).setCellStyle(styleForNames);
-                                 ++var47;
-                                 row.createCell(var47).setCellValue("Специальность");
-                                 row.getCell(var47).setCellStyle(styleForNames);
-                                 ++var47;
-                                 row.createCell(var47).setCellValue("Забрал документы");
-                                 row.getCell(var47).setCellStyle(styleForNames);
-                                 ++var47;
-                              } else {
-                                 row.createCell(0).setCellValue("№п/п");
-                                 row.getCell(0).setCellStyle(styleForNames);
-                                 row.createCell(1).setCellValue("№ЛД");
-                                 row.getCell(1).setCellStyle(styleForNames);
-                                 row.createCell(2).setCellValue("ФИО");
-                                 row.getCell(2).setCellStyle(styleForNames);
-                                 row.createCell(3).setCellValue("Конкурсный балл");
-                                 row.getCell(3).setCellStyle(styleForNames);
-                                 var46 = 4;
-
-                                 for(abitAllIndAchivments = 0; abitAllIndAchivments < allEntranceTestNames.length; ++abitAllIndAchivments) {
-                                    row.createCell(var46 + abitAllIndAchivments).setCellValue(allEntranceTestNames[abitAllIndAchivments][1]);
-                                    row.getCell(var46 + abitAllIndAchivments).setCellStyle(styleForNames);
-                                 }
-
-                                 var47 = var46 + allEntranceTestNames.length;
-                                 row.createCell(var47).setCellValue("Балл за ИД");
-                                 row.getCell(var47).setCellStyle(styleForNames);
-                                 ++var47;
-                                 row.createCell(var47).setCellValue("Средний балл по диплому");
-                                 row.getCell(var47).setCellStyle(styleForNames);
-                                 ++var47;
-                                 row.createCell(var47).setCellValue("Наличие оригинала/согласия на зачисление");
-                                 row.getCell(var47).setCellStyle(styleForNames);
-                                 ++var47;
-                                 row.createCell(var47).setCellValue("Кафедра");
-                                 row.getCell(var47).setCellStyle(styleForNames);
-                                 ++var47;
-                                 row.createCell(var47).setCellValue("Забрал документы");
-                                 row.getCell(var47).setCellStyle(styleForNames);
-                                 ++var47;
-                              }
-
-                              while(rset.next()) {
-                                 row = sheet.createRow(rowNum++);
-                                 int curIndAchNum1;
-                                 String[][] var49;
-                                 if(moduleType.equals("аспирантура")) {
-                                    row.createCell(0).setCellValue((double)(var41++));
-                                    row.getCell(0).setCellStyle(styleForCellsWithCenterAlg);
-                                    row.createCell(1).setCellValue((double)rset.getInt(1));
-                                    row.getCell(1).setCellStyle(styleForCellsWithCenterAlg);
-                                    row.createCell(2).setCellValue(vinitPadeg?Padeg.getFIOPadegFSAS(rset.getString(2) + " " + rset.getString(3) + " " + rset.getString(4), 4):rset.getString(2) + " " + rset.getString(3) + " " + rset.getString(4));
-                                    row.getCell(2).setCellStyle(styleForCells);
-                                    row.createCell(3).setCellValue((double)rset.getInt(5));
-                                    row.getCell(3).setCellStyle(styleForCellsWithCenterAlg);
-                                    var48 = ModelDBConnection.getAllEntranceTestsResultsByAbiturientId(String.valueOf(rset.getInt(1)), false);
-                                    var46 = 4;
-
-                                    for(indAchSum = 0; indAchSum < allEntranceTestNames.length; ++indAchSum) {
-                                       for(baseAchSum = 0; baseAchSum < var48.length; ++baseAchSum) {
-                                          if(allEntranceTestNames[indAchSum][1].equals(var48[baseAchSum][0])) {
-                                             row.createCell(var46 + indAchSum).setCellValue(var48[baseAchSum][4]);
-                                             row.getCell(var46 + indAchSum).setCellStyle(styleForCellsWithCenterAlg);
+                                             ++abitAllIndAchivments;
                                              break;
                                           }
                                        }
-                                    }
 
-                                    var47 = var46 + allEntranceTestNames.length;
-                                    var49 = ModelDBConnection.getAllAchievmentsByAbiturientId(String.valueOf(rset.getInt(1)), true);
-                                    baseAchSum = 0;
-                                    if(moduleType.equals("аспирантура")) {
-                                       for(additionalAchSum = 0; additionalAchSum < (var49 == null?0:var49.length); ++additionalAchSum) {
-                                          baseAchSum += Integer.valueOf(var49[additionalAchSum][2]).intValue();
-                                       }
-                                    } else {
-                                       additionalAchSum = 0;
-                                       curIndAchNum = 0;
-
-                                       for(curIndAchNum1 = 0; curIndAchNum1 < (var49 == null?0:var49.length); ++curIndAchNum1) {
-                                          if(Integer.valueOf(var49[curIndAchNum1][1]).intValue() <= 5) {
-                                             additionalAchSum += Integer.valueOf(var49[curIndAchNum1][2]).intValue();
-                                          } else {
-                                             curIndAchNum += Integer.valueOf(var49[curIndAchNum1][2]).intValue();
+                                       curCellNum = var45 + allEntranceTestNames.length;
+                                       var48 = ModelDBConnection.getAllAchievmentsByAbiturientId(String.valueOf(rset.getInt(1)), true);
+                                       indAchSum = 0;
+                                       if(moduleType.equals("аспирантура")) {
+                                          for(baseAchSum = 0; baseAchSum < (var48 == null?0:var48.length); ++baseAchSum) {
+                                             indAchSum += Integer.valueOf(var48[baseAchSum][2]).intValue();
                                           }
-                                       }
+                                       } else {
+                                          baseAchSum = 0;
+                                          additionalAchSum = 0;
 
-                                       baseAchSum = additionalAchSum + (curIndAchNum > 15?15:curIndAchNum);
-                                       baseAchSum = baseAchSum > 100?100:baseAchSum;
-                                    }
-
-                                    row.createCell(var47).setCellValue((double)baseAchSum);
-                                    row.getCell(var47).setCellStyle(styleForCellsWithCenterAlg);
-                                    ++var47;
-                                    row.createCell(var47).setCellValue(rset.getString(6));
-                                    row.getCell(var47).setCellStyle(styleForCellsWithCenterAlg);
-                                    ++var47;
-                                    row.createCell(var47).setCellValue(rset.getString(7));
-                                    row.getCell(var47).setCellStyle(styleForCellsWithCenterAlg);
-                                    ++var47;
-                                    row.createCell(var47).setCellValue(rset.getString(8));
-                                    row.getCell(var47).setCellStyle(styleForCellsWithCenterAlg);
-                                 } else {
-                                    row.createCell(0).setCellValue((double)(var41++));
-                                    row.getCell(0).setCellStyle(styleForCellsWithCenterAlg);
-                                    row.createCell(1).setCellValue((double)rset.getInt(1));
-                                    row.getCell(1).setCellStyle(styleForCellsWithCenterAlg);
-                                    row.createCell(2).setCellValue(vinitPadeg?Padeg.getFIOPadegFSAS(rset.getString(2) + " " + rset.getString(3) + " " + rset.getString(4), 4):rset.getString(2) + " " + rset.getString(3) + " " + rset.getString(4));
-                                    row.getCell(2).setCellStyle(styleForCells);
-                                    row.createCell(3).setCellValue((double)rset.getInt(5));
-                                    row.getCell(3).setCellStyle(styleForCellsWithCenterAlg);
-                                    var48 = ModelDBConnection.getAllEntranceTestsResultsByAbiturientId(String.valueOf(rset.getInt(1)), false);
-                                    var46 = 4;
-                                    indAchSum = 0;
-
-                                    while(indAchSum < allEntranceTestNames.length) {
-                                       baseAchSum = 0;
-
-                                       while(true) {
-                                          if(baseAchSum < var48.length) {
-                                             if(!allEntranceTestNames[indAchSum][1].equals(var48[baseAchSum][0])) {
-                                                ++baseAchSum;
-                                                continue;
+                                          for(curIndAchNum = 0; curIndAchNum < (var48 == null?0:var48.length); ++curIndAchNum) {
+                                             if(Integer.valueOf(var48[curIndAchNum][1]).intValue() <= 5) {
+                                                baseAchSum += Integer.valueOf(var48[curIndAchNum][2]).intValue();
+                                             } else {
+                                                additionalAchSum += Integer.valueOf(var48[curIndAchNum][2]).intValue();
                                              }
-
-                                             row.createCell(var46 + indAchSum).setCellValue(var48[baseAchSum][4]);
-                                             row.getCell(var46 + indAchSum).setCellStyle(styleForCellsWithCenterAlg);
                                           }
 
-                                          ++indAchSum;
-                                          break;
+                                          indAchSum = baseAchSum + (additionalAchSum > 15?15:additionalAchSum);
+                                          indAchSum = indAchSum > 100?100:indAchSum;
                                        }
+
+                                       row.createCell(curCellNum).setCellValue((double)indAchSum);
+                                       row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
+                                       ++curCellNum;
+                                       row.createCell(curCellNum).setCellValue(rset.getString(9));
+                                       row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
+                                       ++curCellNum;
+                                       row.createCell(curCellNum).setCellValue(rset.getString(6));
+                                       row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
+                                       ++curCellNum;
+                                       row.createCell(curCellNum).setCellValue(rset.getString(10));
+                                       row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
+                                       ++curCellNum;
+                                       row.createCell(curCellNum).setCellValue(rset.getString(7));
+                                       row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
+                                       ++curCellNum;
+                                       row.createCell(curCellNum).setCellValue(rset.getString(11));
+                                       row.getCell(curCellNum).setCellStyle(styleForCellsWithCenterAlg);
                                     }
-
-                                    var47 = var46 + allEntranceTestNames.length;
-                                    var49 = ModelDBConnection.getAllAchievmentsByAbiturientId(String.valueOf(rset.getInt(1)), true);
-                                    baseAchSum = 0;
-                                    if(moduleType.equals("аспирантура")) {
-                                       for(additionalAchSum = 0; additionalAchSum < (var49 == null?0:var49.length); ++additionalAchSum) {
-                                          baseAchSum += Integer.valueOf(var49[additionalAchSum][2]).intValue();
-                                       }
-                                    } else {
-                                       additionalAchSum = 0;
-                                       curIndAchNum = 0;
-
-                                       for(curIndAchNum1 = 0; curIndAchNum1 < (var49 == null?0:var49.length); ++curIndAchNum1) {
-                                          if(Integer.valueOf(var49[curIndAchNum1][1]).intValue() <= 5) {
-                                             additionalAchSum += Integer.valueOf(var49[curIndAchNum1][2]).intValue();
-                                          } else {
-                                             curIndAchNum += Integer.valueOf(var49[curIndAchNum1][2]).intValue();
-                                          }
-                                       }
-
-                                       baseAchSum = additionalAchSum + (curIndAchNum > 15?15:curIndAchNum);
-                                       baseAchSum = baseAchSum > 100?100:baseAchSum;
-                                    }
-
-                                    row.createCell(var47).setCellValue((double)baseAchSum);
-                                    row.getCell(var47).setCellStyle(styleForCellsWithCenterAlg);
-                                    ++var47;
-                                    row.createCell(var47).setCellValue(rset.getString(9));
-                                    row.getCell(var47).setCellStyle(styleForCellsWithCenterAlg);
-                                    ++var47;
-                                    row.createCell(var47).setCellValue(rset.getString(6));
-                                    row.getCell(var47).setCellStyle(styleForCellsWithCenterAlg);
-                                    ++var47;
-                                    row.createCell(var47).setCellValue(rset.getString(10));
-                                    row.getCell(var47).setCellStyle(styleForCellsWithCenterAlg);
-                                    ++var47;
-                                    row.createCell(var47).setCellValue(rset.getString(7));
-                                    row.getCell(var47).setCellStyle(styleForCellsWithCenterAlg);
                                  }
                               }
-                           }
 
-                           rset.close();
+                              rset.close();
+                           } else {
+                              for(countAbitsOnCurSpecOnCurCompGrAndSt = 0; countAbitsOnCurSpecOnCurCompGrAndSt < targetOrganisations.length; ++countAbitsOnCurSpecOnCurCompGrAndSt) {
+                                 var41 = 1;
+                                 query = moduleType.equals("аспирантура")?"select aid, SName, Fname, isNULL(MName,\'\'), competitiveBall, case when originalsReceivedDate is not null then \'+\' else \'-\' end, Speciality.name, case when returnDate is not null then \'+\' else \'-\' end, (select sum(isNULL(score, 0)) from AbiturientEntranceTests where AbiturientCompetitiveGroup.aid_abiturient = AbiturientEntranceTests.aid_abiturient) as entranceTestsSum from (Speciality join AbiturientCompetitiveGroup on (AbiturientCompetitiveGroup.speciality = Speciality.id) join Abiturient on (AbiturientCompetitiveGroup.aid_abiturient = Abiturient.aid)) left outer join ReturnReasons on (ReturnReasons.id = Abiturient.id_returnReason) where course = \'" + specialities[path][0] + "\' and targetOrganisation = \'" + targetOrganisations[countAbitsOnCurSpecOnCurCompGrAndSt][0] + "\' " + "and AbiturientCompetitiveGroup.markEnrollment > 0 " + "order by competitiveBall desc, entranceTestsSum desc":"select aid, SName, Fname, isNULL(MName,\'\'), competitiveBall, case when originalsReceivedDate is not null then \'+\' else \'-\' end, case when returnDate is not null then \'+\' else \'-\' end, (select sum(isNULL(score, 0)) from AbiturientEntranceTests where AbiturientCompetitiveGroup.aid_abiturient = AbiturientEntranceTests.aid_abiturient) as entranceTestsSum, (select isNull(avgBall, 0) from AbiturientHigherEducation where AbiturientCompetitiveGroup.aid_abiturient = AbiturientHigherEducation.aid_abiturient) as avgDiplomaBall, Chair.name from (Chair join AbiturientCompetitiveGroup on (AbiturientCompetitiveGroup.chair = Chair.id) join Abiturient on (AbiturientCompetitiveGroup.aid_abiturient = Abiturient.aid)) left outer join ReturnReasons on (ReturnReasons.id = Abiturient.id_returnReason) where speciality = \'" + specialities[path][0] + "\' and targetOrganisation = \'" + targetOrganisations[countAbitsOnCurSpecOnCurCompGrAndSt][0] + "\' " + "and AbiturientCompetitiveGroup.markEnrollment > 0 " + "order by competitiveBall desc, entranceTestsSum desc, avgDiplomaBall desc";
+                                 cstmt = con.prepareCall(query, 1004, 1007);
+                                 rset = cstmt.executeQuery();
+                                 curCellNum = rset.last()?rset.getRow():0;
+                                 rset.beforeFirst();
+                                 if(curCellNum > 0) {
+                                    row = sheet.createRow(rowNum++);
+                                    row = sheet.createRow(rowNum++);
+                                    row.createCell(0).setCellValue("Целевая организация: " + targetOrganisations[countAbitsOnCurSpecOnCurCompGrAndSt][1]);
+                                    sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 4));
+                                    row.getCell(0).setCellStyle(styleForTargetOrgs);
+                                    row = sheet.createRow(rowNum++);
+                                    boolean abitAllEntranceResults = false;
+                                    byte var46;
+                                    if(moduleType.equals("аспирантура")) {
+                                       row.createCell(0).setCellValue("№п/п");
+                                       row.getCell(0).setCellStyle(styleForNames);
+                                       row.createCell(1).setCellValue("№ЛД");
+                                       row.getCell(1).setCellStyle(styleForNames);
+                                       row.createCell(2).setCellValue("ФИО");
+                                       row.getCell(2).setCellStyle(styleForNames);
+                                       row.createCell(3).setCellValue("Конкурсный балл");
+                                       row.getCell(3).setCellStyle(styleForNames);
+                                       var46 = 4;
+
+                                       for(abitAllIndAchivments = 0; abitAllIndAchivments < allEntranceTestNames.length; ++abitAllIndAchivments) {
+                                          row.createCell(var46 + abitAllIndAchivments).setCellValue(allEntranceTestNames[abitAllIndAchivments][1]);
+                                          row.getCell(var46 + abitAllIndAchivments).setCellStyle(styleForNames);
+                                       }
+
+                                       var47 = var46 + allEntranceTestNames.length;
+                                       row.createCell(var47).setCellValue("Балл за ИД");
+                                       row.getCell(var47).setCellStyle(styleForNames);
+                                       ++var47;
+                                       row.createCell(var47).setCellValue("Наличие оригинала/согласия на зачисление");
+                                       row.getCell(var47).setCellStyle(styleForNames);
+                                       ++var47;
+                                       row.createCell(var47).setCellValue("Специальность");
+                                       row.getCell(var47).setCellStyle(styleForNames);
+                                       ++var47;
+                                       row.createCell(var47).setCellValue("Забрал документы");
+                                       row.getCell(var47).setCellStyle(styleForNames);
+                                       ++var47;
+                                    } else {
+                                       row.createCell(0).setCellValue("№п/п");
+                                       row.getCell(0).setCellStyle(styleForNames);
+                                       row.createCell(1).setCellValue("№ЛД");
+                                       row.getCell(1).setCellStyle(styleForNames);
+                                       row.createCell(2).setCellValue("ФИО");
+                                       row.getCell(2).setCellStyle(styleForNames);
+                                       row.createCell(3).setCellValue("Конкурсный балл");
+                                       row.getCell(3).setCellStyle(styleForNames);
+                                       var46 = 4;
+
+                                       for(abitAllIndAchivments = 0; abitAllIndAchivments < allEntranceTestNames.length; ++abitAllIndAchivments) {
+                                          row.createCell(var46 + abitAllIndAchivments).setCellValue(allEntranceTestNames[abitAllIndAchivments][1]);
+                                          row.getCell(var46 + abitAllIndAchivments).setCellStyle(styleForNames);
+                                       }
+
+                                       var47 = var46 + allEntranceTestNames.length;
+                                       row.createCell(var47).setCellValue("Балл за ИД");
+                                       row.getCell(var47).setCellStyle(styleForNames);
+                                       ++var47;
+                                       row.createCell(var47).setCellValue("Средний балл по диплому");
+                                       row.getCell(var47).setCellStyle(styleForNames);
+                                       ++var47;
+                                       row.createCell(var47).setCellValue("Наличие оригинала/согласия на зачисление");
+                                       row.getCell(var47).setCellStyle(styleForNames);
+                                       ++var47;
+                                       row.createCell(var47).setCellValue("Кафедра");
+                                       row.getCell(var47).setCellStyle(styleForNames);
+                                       ++var47;
+                                       row.createCell(var47).setCellValue("Забрал документы");
+                                       row.getCell(var47).setCellStyle(styleForNames);
+                                       ++var47;
+                                    }
+
+                                    while(rset.next()) {
+                                       row = sheet.createRow(rowNum++);
+                                       int curIndAchNum1;
+                                       String[][] var49;
+                                       if(moduleType.equals("аспирантура")) {
+                                          row.createCell(0).setCellValue((double)(var41++));
+                                          row.getCell(0).setCellStyle(styleForCellsWithCenterAlg);
+                                          row.createCell(1).setCellValue((double)rset.getInt(1));
+                                          row.getCell(1).setCellStyle(styleForCellsWithCenterAlg);
+                                          row.createCell(2).setCellValue(vinitPadeg?Padeg.getFIOPadegFSAS(rset.getString(2) + " " + rset.getString(3) + " " + rset.getString(4), 4):rset.getString(2) + " " + rset.getString(3) + " " + rset.getString(4));
+                                          row.getCell(2).setCellStyle(styleForCells);
+                                          row.createCell(3).setCellValue((double)rset.getInt(5));
+                                          row.getCell(3).setCellStyle(styleForCellsWithCenterAlg);
+                                          var48 = ModelDBConnection.getAllEntranceTestsResultsByAbiturientId(String.valueOf(rset.getInt(1)), false);
+                                          var46 = 4;
+
+                                          for(indAchSum = 0; indAchSum < allEntranceTestNames.length; ++indAchSum) {
+                                             for(baseAchSum = 0; baseAchSum < var48.length; ++baseAchSum) {
+                                                if(allEntranceTestNames[indAchSum][1].equals(var48[baseAchSum][0])) {
+                                                   row.createCell(var46 + indAchSum).setCellValue(var48[baseAchSum][4]);
+                                                   row.getCell(var46 + indAchSum).setCellStyle(styleForCellsWithCenterAlg);
+                                                   break;
+                                                }
+                                             }
+                                          }
+
+                                          var47 = var46 + allEntranceTestNames.length;
+                                          var49 = ModelDBConnection.getAllAchievmentsByAbiturientId(String.valueOf(rset.getInt(1)), true);
+                                          baseAchSum = 0;
+                                          if(moduleType.equals("аспирантура")) {
+                                             for(additionalAchSum = 0; additionalAchSum < (var49 == null?0:var49.length); ++additionalAchSum) {
+                                                baseAchSum += Integer.valueOf(var49[additionalAchSum][2]).intValue();
+                                             }
+                                          } else {
+                                             additionalAchSum = 0;
+                                             curIndAchNum = 0;
+
+                                             for(curIndAchNum1 = 0; curIndAchNum1 < (var49 == null?0:var49.length); ++curIndAchNum1) {
+                                                if(Integer.valueOf(var49[curIndAchNum1][1]).intValue() <= 5) {
+                                                   additionalAchSum += Integer.valueOf(var49[curIndAchNum1][2]).intValue();
+                                                } else {
+                                                   curIndAchNum += Integer.valueOf(var49[curIndAchNum1][2]).intValue();
+                                                }
+                                             }
+
+                                             baseAchSum = additionalAchSum + (curIndAchNum > 15?15:curIndAchNum);
+                                             baseAchSum = baseAchSum > 100?100:baseAchSum;
+                                          }
+
+                                          row.createCell(var47).setCellValue((double)baseAchSum);
+                                          row.getCell(var47).setCellStyle(styleForCellsWithCenterAlg);
+                                          ++var47;
+                                          row.createCell(var47).setCellValue(rset.getString(6));
+                                          row.getCell(var47).setCellStyle(styleForCellsWithCenterAlg);
+                                          ++var47;
+                                          row.createCell(var47).setCellValue(rset.getString(7));
+                                          row.getCell(var47).setCellStyle(styleForCellsWithCenterAlg);
+                                          ++var47;
+                                          row.createCell(var47).setCellValue(rset.getString(8));
+                                          row.getCell(var47).setCellStyle(styleForCellsWithCenterAlg);
+                                       } else {
+                                          row.createCell(0).setCellValue((double)(var41++));
+                                          row.getCell(0).setCellStyle(styleForCellsWithCenterAlg);
+                                          row.createCell(1).setCellValue((double)rset.getInt(1));
+                                          row.getCell(1).setCellStyle(styleForCellsWithCenterAlg);
+                                          row.createCell(2).setCellValue(vinitPadeg?Padeg.getFIOPadegFSAS(rset.getString(2) + " " + rset.getString(3) + " " + rset.getString(4), 4):rset.getString(2) + " " + rset.getString(3) + " " + rset.getString(4));
+                                          row.getCell(2).setCellStyle(styleForCells);
+                                          row.createCell(3).setCellValue((double)rset.getInt(5));
+                                          row.getCell(3).setCellStyle(styleForCellsWithCenterAlg);
+                                          var48 = ModelDBConnection.getAllEntranceTestsResultsByAbiturientId(String.valueOf(rset.getInt(1)), false);
+                                          var46 = 4;
+                                          indAchSum = 0;
+
+                                          while(indAchSum < allEntranceTestNames.length) {
+                                             baseAchSum = 0;
+
+                                             while(true) {
+                                                if(baseAchSum < var48.length) {
+                                                   if(!allEntranceTestNames[indAchSum][1].equals(var48[baseAchSum][0])) {
+                                                      ++baseAchSum;
+                                                      continue;
+                                                   }
+
+                                                   row.createCell(var46 + indAchSum).setCellValue(var48[baseAchSum][4]);
+                                                   row.getCell(var46 + indAchSum).setCellStyle(styleForCellsWithCenterAlg);
+                                                }
+
+                                                ++indAchSum;
+                                                break;
+                                             }
+                                          }
+
+                                          var47 = var46 + allEntranceTestNames.length;
+                                          var49 = ModelDBConnection.getAllAchievmentsByAbiturientId(String.valueOf(rset.getInt(1)), true);
+                                          baseAchSum = 0;
+                                          if(moduleType.equals("аспирантура")) {
+                                             for(additionalAchSum = 0; additionalAchSum < (var49 == null?0:var49.length); ++additionalAchSum) {
+                                                baseAchSum += Integer.valueOf(var49[additionalAchSum][2]).intValue();
+                                             }
+                                          } else {
+                                             additionalAchSum = 0;
+                                             curIndAchNum = 0;
+
+                                             for(curIndAchNum1 = 0; curIndAchNum1 < (var49 == null?0:var49.length); ++curIndAchNum1) {
+                                                if(Integer.valueOf(var49[curIndAchNum1][1]).intValue() <= 5) {
+                                                   additionalAchSum += Integer.valueOf(var49[curIndAchNum1][2]).intValue();
+                                                } else {
+                                                   curIndAchNum += Integer.valueOf(var49[curIndAchNum1][2]).intValue();
+                                                }
+                                             }
+
+                                             baseAchSum = additionalAchSum + (curIndAchNum > 15?15:curIndAchNum);
+                                             baseAchSum = baseAchSum > 100?100:baseAchSum;
+                                          }
+
+                                          row.createCell(var47).setCellValue((double)baseAchSum);
+                                          row.getCell(var47).setCellStyle(styleForCellsWithCenterAlg);
+                                          ++var47;
+                                          row.createCell(var47).setCellValue(rset.getString(9));
+                                          row.getCell(var47).setCellStyle(styleForCellsWithCenterAlg);
+                                          ++var47;
+                                          row.createCell(var47).setCellValue(rset.getString(6));
+                                          row.getCell(var47).setCellStyle(styleForCellsWithCenterAlg);
+                                          ++var47;
+                                          row.createCell(var47).setCellValue(rset.getString(10));
+                                          row.getCell(var47).setCellStyle(styleForCellsWithCenterAlg);
+                                          ++var47;
+                                          row.createCell(var47).setCellValue(rset.getString(7));
+                                          row.getCell(var47).setCellStyle(styleForCellsWithCenterAlg);
+                                       }
+                                    }
+                                 }
+
+                                 rset.close();
+                              }
+                           }
                         }
                      }
+
+                     
+
                   }
-               } else {
+               }
+                     //// платка
+
+
+
+               
+               if ((competitiveGroups[cg_i][0].equals("3") || competitiveGroups[cg_i][0].equals("4") || competitiveGroups[cg_i][0].equals("5"))) {
                   query = moduleType.equals("аспирантура")?"select aid, SName, Fname, isNULL(MName,\'\'), competitiveBall, case when originalsReceivedDate is not null then \'+\' else \'-\' end, Speciality.name, case when returnDate is not null then \'+\' else \'-\' end, EducationForm.name, (select sum(isNULL(score, 0)) from AbiturientEntranceTests where AbiturientCompetitiveGroup.aid_abiturient = AbiturientEntranceTests.aid_abiturient) as entranceTestsSum from (Speciality join AbiturientCompetitiveGroup on (AbiturientCompetitiveGroup.speciality = Speciality.id) join Abiturient on (AbiturientCompetitiveGroup.aid_abiturient = Abiturient.aid) join EducationForm on (AbiturientCompetitiveGroup.educationForm = EducationForm.id)) left outer join ReturnReasons on (ReturnReasons.id = Abiturient.id_returnReason) where course = \'" + specialities[path][0] + "\' and competitiveGroup = \'" + competitiveGroups[cg_i][0] + "\' and targetOrganisation is null " + "and AbiturientCompetitiveGroup.markEnrollment > 0 " + "order by competitiveBall desc, entranceTestsSum desc":"select aid, SName, Fname, isNULL(MName,\'\'), competitiveBall, case when originalsReceivedDate is not null then \'+\' else \'-\' end, case when returnDate is not null then \'+\' else \'-\' end, EducationStandard.name, (select sum(isNULL(score, 0)) from AbiturientEntranceTests where AbiturientCompetitiveGroup.aid_abiturient = AbiturientEntranceTests.aid_abiturient) as entranceTestsSum, (select isNull(avgBall, 0) from AbiturientHigherEducation where AbiturientCompetitiveGroup.aid_abiturient = AbiturientHigherEducation.aid_abiturient) as avgDiplomaBall, Chair.name from (Chair join AbiturientCompetitiveGroup on (AbiturientCompetitiveGroup.chair = Chair.id) join Abiturient on (AbiturientCompetitiveGroup.aid_abiturient = Abiturient.aid) join EducationStandard on (AbiturientCompetitiveGroup.educationStandard = EducationStandard.id)) left outer join ReturnReasons on (ReturnReasons.id = Abiturient.id_returnReason) where speciality = \'" + specialities[path][0] + "\' and competitiveGroup = \'" + competitiveGroups[cg_i][0] + "\' and targetOrganisation is null " + "and AbiturientCompetitiveGroup.markEnrollment > 0 " + "order by competitiveBall desc, entranceTestsSum desc, avgDiplomaBall desc";
                   cstmt = con.prepareCall(query, 1004, 1007);
                   rset = cstmt.executeQuery();
